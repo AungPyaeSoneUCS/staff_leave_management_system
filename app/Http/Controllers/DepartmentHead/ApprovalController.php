@@ -27,8 +27,7 @@ class ApprovalController extends Controller
             ->where('current_approval_level', 1)
             ->where(function ($query) {
                 $query->whereNull('duty_exchange_user_id')
-                    ->orWhereNull('duty_exchange_status')
-                    ->orWhere('duty_exchange_status', '!=', 'pending');
+                    ->orWhere('duty_exchange_status', 'accepted');
             })
             ->whereHas('user', function ($query) use ($departmentId) {
                 $query->where('department_id', $departmentId)

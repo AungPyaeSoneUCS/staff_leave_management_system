@@ -20,6 +20,10 @@ class ApprovalController extends Controller
     public function pendingRequests(Request $request)
     {
         $query = LeaveRequest::where('status', 'pending')
+            ->where(function ($query) {
+                $query->whereNull('duty_exchange_user_id')
+                    ->orWhere('duty_exchange_status', 'accepted');
+            })
             ->with('user', 'leaveType', 'user.department', 'reviewer', 'dutyExchangeUser');
 
         if (auth()->user()->isSuperAdmin()) {

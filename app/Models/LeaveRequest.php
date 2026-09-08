@@ -133,6 +133,6 @@ class LeaveRequest extends Model
 
     public function isAwaitingDutyExchange(): bool
     {
-        return $this->isPending() && $this->duty_exchange_user_id !== null && $this->duty_exchange_status === 'pending';
+        return $this->isPending() && $this->duty_exchange_user_id !== null && $this->duty_exchange_status !== 'accepted' && $this->duty_exchange_status !== 'rejected';
     }
 }

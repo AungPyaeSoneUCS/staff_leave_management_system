@@ -16,7 +16,10 @@ class DutyExchangeController extends Controller
     {
         $pendingRequests = LeaveRequest::where('duty_exchange_user_id', auth()->id())
             ->where('status', 'pending')
-            ->where('duty_exchange_status', 'pending')
+            ->where(function ($query) {
+                $query->where('duty_exchange_status', 'pending')
+                    ->orWhereNull('duty_exchange_status');
+            })
             ->with('user', 'leaveType', 'user.department')
             ->latest()
             ->paginate(10);

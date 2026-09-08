@@ -100,7 +100,7 @@
         @if($leaveRequest->duty_exchange_user_id && $leaveRequest->dutyExchangeUser)
             <div class="border-t border-slate-100 pt-6">
                 <h3 class="cu-section-title mb-4">{{ __('common.duty_exchange') }}</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <p class="cu-muted">{{ __('common.staff') }}</p>
                         <p class="text-base font-semibold text-slate-900">
@@ -110,6 +110,10 @@
                     <div>
                         <p class="cu-muted">{{ __('common.position') }}</p>
                         <p class="text-base font-semibold text-slate-900">{{ $leaveRequest->dutyExchangeUser->position ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="cu-muted">{{ __('common.remarks') }}</p>
+                        <p class="text-base font-semibold text-slate-900">{{ $leaveRequest->duty_exchange_remarks ?: '—' }}</p>
                     </div>
                 </div>
             </div>
