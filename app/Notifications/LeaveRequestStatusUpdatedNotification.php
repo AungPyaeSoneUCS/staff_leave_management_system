@@ -31,6 +31,7 @@ class LeaveRequestStatusUpdatedNotification extends Notification implements Shou
             'updated' => 'leave_request_updated',
             'dept_approved' => 'dept_head_approved',
             'revoked' => 'leave_request_updated',
+            'duty_exchange_accepted' => 'duty_exchange_accepted',
             default => 'leave_request_approved',
         };
 
@@ -81,6 +82,7 @@ class LeaveRequestStatusUpdatedNotification extends Notification implements Shou
             'pending_super_admin' => __('notifications.leave_request_forwarded_super_admin'),
             'updated' => __('notifications.leave_request_updated'),
             'dept_approved' => __('notifications.dept_head_approved_title'),
+            'duty_exchange_accepted' => __('notifications.duty_exchange_accepted_title'),
             default => __('notifications.leave_request_status_updated'),
         };
 
@@ -89,6 +91,7 @@ class LeaveRequestStatusUpdatedNotification extends Notification implements Shou
         $leaveTypeName = $locale == 'my' ? ($this->leaveRequest->leaveType->name_mm ?? $this->leaveRequest->leaveType->name) : $this->leaveRequest->leaveType->name;
         $reviewerName = $this->leaveRequest->reviewer ? ($locale == 'my' ? ($this->leaveRequest->reviewer->name_mm ?? $this->leaveRequest->reviewer->name) : $this->leaveRequest->reviewer->name) : __('common.not_assigned');
         $departmentName = $this->leaveRequest->user->department?->name ?? __('common.no_department');
+        $exchangeUserName = $this->leaveRequest->dutyExchangeUser ? ($locale == 'my' ? ($this->leaveRequest->dutyExchangeUser->name_mm ?? $this->leaveRequest->dutyExchangeUser->name) : $this->leaveRequest->dutyExchangeUser->name) : __('common.n_a');
 
         $message = match ($this->status) {
             'pending_hr' => __('notifications.pending_hr_staff_message', [
@@ -105,6 +108,9 @@ class LeaveRequestStatusUpdatedNotification extends Notification implements Shou
             'updated' => __('notifications.updated_message', [
                 'days' => $this->leaveRequest->total_days,
                 'leave_type' => $leaveTypeName,
+            ]),
+            'duty_exchange_accepted' => __('notifications.duty_exchange_accepted_message', [
+                'user' => $exchangeUserName,
             ]),
             default => __('notifications.status_update_message', [
                 'days' => $this->leaveRequest->total_days,

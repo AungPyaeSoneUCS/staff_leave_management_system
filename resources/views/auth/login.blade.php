@@ -90,10 +90,6 @@
                             {{ __('auth.sign_in_button') }}
                         </button>
 
-                        <a href="{{ route('super-admin.register') }}" class="block text-center text-sm font-bold text-teal-800 transition hover:text-teal-950">
-                            {{ __('auth.super_admin_register_link') }}
-                        </a>
-
                         <a href="{{ url('/') }}" class="block text-center text-sm font-bold text-slate-600 transition hover:text-teal-800">
                             {{ __('common.back') }}
                         </a>

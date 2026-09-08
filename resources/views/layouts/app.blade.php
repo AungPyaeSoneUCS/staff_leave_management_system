@@ -50,6 +50,14 @@
                             </svg>
                             <span>{{ __('nav.leave_requests') }}</span>
                         </a>
+                        <a href="{{ route('duty-exchange.index') }}"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('duty-exchange.*') ? 'bg-gold-100 text-slate-700' : 'text-white/70 hover:bg-white/5 hover:text-white' }} transition-colors">
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                            </svg>
+                            <span>{{ __('nav.duty_exchange') }}</span>
+                        </a>
                         {{-- <a href="{{ route('staff.calendar') }}"
                             class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('staff.calendar') ? 'bg-gold-100 text-slate-700' : 'text-white/70 hover:bg-white/5 hover:text-white' }} transition-colors">
                             <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -121,6 +129,14 @@
                                 </path>
                             </svg>
                             <span>{{ __('nav.leave_requests') }}</span>
+                        </a>
+                        <a href="{{ route('duty-exchange.index') }}"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('duty-exchange.*') ? 'bg-gold-100 text-slate-700' : 'text-white/70 hover:bg-white/5 hover:text-white' }} transition-colors">
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                            </svg>
+                            <span>{{ __('nav.duty_exchange') }}</span>
                         </a>
                         <a href="{{ route('department-head.approvals.pending') }}"
                             class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('department-head.approvals.pending') ? 'bg-gold-100 text-slate-700' : 'text-white/70 hover:bg-white/5 hover:text-white' }} transition-colors">

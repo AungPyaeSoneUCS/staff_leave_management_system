@@ -32,44 +32,28 @@
                         <a href="{{ route('lang.switch', 'en') }}" class="rounded-full px-2.5 py-1.5 text-xs font-bold transition sm:px-3 {{ session('locale', 'en') === 'en' ? 'bg-teal-700 text-white shadow' : 'text-slate-600 hover:text-teal-800' }}">{{ __('nav.english') }}</a>
                         <a href="{{ route('lang.switch', 'my') }}" class="rounded-full px-2.5 py-1.5 text-xs font-bold transition sm:px-3 {{ session('locale') === 'my' ? 'bg-teal-700 text-white shadow' : 'text-slate-600 hover:text-teal-800' }}">{{ __('nav.myanmar') }}</a>
                     </div>
-                    <a href="{{ route('login') }}" class="inline-flex items-center justify-center rounded-full bg-teal-700 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-teal-800/15 transition hover:bg-teal-800 hover:shadow-teal-800/25 sm:px-5">
-                        {{ __('auth.sign_in_button') }}
-                    </a>
                 </div>
             </div>
         </header>
 
         <main class="mx-auto w-full max-w-7xl flex-1 px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
-            <div class="lg:mt-8">
-                <section class="grid gap-10 lg:grid-cols-12 lg:items-center">
-                    <div class="flex flex-col items-start space-y-6 lg:col-span-7">
-                        <div class="inline-flex items-center gap-2 rounded-full border border-teal-700/10 bg-white/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-teal-800 shadow-sm backdrop-blur sm:px-4 sm:py-2 sm:text-[15px] lg:text-[23px] lg:tracking-[0.22em]">
-                            {{ __('landing.system_name') }}
-                        </div>
+            <div class="flex min-h-[70vh] flex-col items-center justify-center text-center">
+                <h2 id="typing-heading" data-text="{{ __('landing.university_name') }}" aria-label="{{ __('landing.university_name') }}"
+                    class="min-h-[4rem] max-w-4xl text-2xl font-black leading-tight tracking-tight text-slate-900 sm:min-h-[4.5rem] sm:text-3xl lg:min-h-[2.5rem] lg:text-4xl"></h2>
 
-                        <div class="space-y-4">
-                            <h2 class="text-2xl font-black leading-tight tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
-                                {{ __('landing.university_name') }}
-                            </h2>
-                            <p class="text-sm leading-relaxed text-slate-700 sm:text-base lg:text-lg">
-                                {{ __('landing.available_leave') }}
-                            </p>
-                        </div>
+                <div class="mt-6 inline-flex items-center gap-2 rounded-full border border-teal-700/10 bg-white/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-teal-800 shadow-sm backdrop-blur sm:px-4 sm:py-2 sm:text-[15px] lg:text-[23px] lg:tracking-[0.22em]">
+                    {{ __('landing.system_name') }}
+                </div>
 
-                        <div class="w-full pt-2 sm:w-auto">
-                            <a href="{{ route('login') }}" class="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-teal-700 to-emerald-700 px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-teal-800/20 transition hover:-translate-y-0.5 hover:from-teal-800 hover:to-emerald-800 sm:w-auto">
-                                {{ __('auth.sign_in_title') }}
-                            </a>
-                        </div>
-                    </div>
+                <p class="mt-6 max-w-2xl text-sm leading-relaxed text-slate-700 sm:text-base lg:text-lg">
+                    {{ __('landing.available_leave') }}
+                </p>
 
-                    <div class="flex justify-center lg:col-span-5 lg:justify-end">
-                        <div class="relative flex h-56 w-56 items-center justify-center rounded-3xl border border-white/80 bg-white/60 p-4 shadow-2xl shadow-teal-900/10 backdrop-blur-xl ring-1 ring-teal-700/10 sm:h-80 sm:w-80 sm:p-6">
-                            <div class="absolute inset-0 -z-10 rounded-3xl bg-gradient-to-br from-teal-500/10 to-emerald-500/10 blur-xl"></div>
-                            <img src="{{ asset('images/university.png') }}" alt="University Logo" class="h-full w-full object-cover rounded-3xl drop-shadow-md">
-                        </div>
-                    </div>
-                </section>
+                <div class="mt-8">
+                    <a href="{{ route('login') }}" class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-teal-700 to-emerald-700 px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-teal-800/20 transition hover:-translate-y-0.5 hover:from-teal-800 hover:to-emerald-800">
+                        {{ __('auth.sign_in_title') }}
+                    </a>
+                </div>
             </div>
         </main>
     </div>

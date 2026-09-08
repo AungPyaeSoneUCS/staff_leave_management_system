@@ -280,6 +280,39 @@ document.addEventListener('click', function(event) {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
+    const heading = document.getElementById('typing-heading');
+    if (heading) {
+        const text = heading.getAttribute('data-text') || '';
+        if (text) {
+            function typeFrom(start) {
+                heading.textContent = '';
+
+                const cursor = document.createElement('span');
+                cursor.className = 'typing-cursor';
+                cursor.setAttribute('aria-hidden', 'true');
+                cursor.textContent = '|';
+                heading.appendChild(cursor);
+
+                let index = start;
+                (function typeNext() {
+                    if (index < text.length) {
+                        heading.insertBefore(document.createTextNode(text.charAt(index)), cursor);
+                        index++;
+                        setTimeout(typeNext, 60);
+                    } else {
+                        setTimeout(function() {
+                            typeFrom(0);
+                        }, 5000);
+                    }
+                })();
+            }
+
+            typeFrom(0);
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
     const bell = document.getElementById('notification-bell');
     if (bell) {
         bell.addEventListener('click', function(e) {

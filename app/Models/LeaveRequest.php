@@ -32,6 +32,9 @@ class LeaveRequest extends Model
         'super_admin_signature',
         'is_half_day',
         'duty_exchange_user_id',
+        'duty_exchange_status',
+        'duty_exchange_confirmed_at',
+        'duty_exchange_remarks',
     ];
 
     protected function casts(): array
@@ -43,6 +46,7 @@ class LeaveRequest extends Model
             'status' => 'string',
             'current_approval_level' => 'integer',
             'reviewed_at' => 'datetime',
+            'duty_exchange_confirmed_at' => 'datetime',
             'is_half_day' => 'boolean',
         ];
     }
@@ -125,5 +129,10 @@ class LeaveRequest extends Model
     public function isAwaitingSuperAdmin(): bool
     {
         return $this->isPending() && $this->current_approval_level === 3;
+    }
+
+    public function isAwaitingDutyExchange(): bool
+    {
+        return $this->isPending() && $this->duty_exchange_user_id !== null && $this->duty_exchange_status === 'pending';
     }
 }

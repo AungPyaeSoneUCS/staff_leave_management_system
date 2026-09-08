@@ -7,6 +7,7 @@ use App\Models\AdminAssignment;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use App\Models\User;
+use App\Notifications\DutyExchangeRequestNotification;
 use App\Notifications\LeaveRequestStatusUpdatedNotification;
 use App\Notifications\LeaveRequestSubmittedNotification;
 use App\Services\LeaveWorkflowService;
@@ -161,6 +162,7 @@ class LeaveRequestController extends Controller
             'status' => 'pending',
             'current_approval_level' => auth()->user()->isDepartmentHead() || auth()->user()->require_admin_approval ? 2 : 1,
             'duty_exchange_user_id' => $validated['duty_exchange_user_id'] ?? null,
+            'duty_exchange_status' => ! empty($validated['duty_exchange_user_id']) ? 'pending' : null,
             'is_half_day' => $isHalfDay,
         ]);
 
@@ -174,7 +176,13 @@ class LeaveRequestController extends Controller
 
         $leaveRequest->save();
 
-        if (auth()->user()->isDepartmentHead() || auth()->user()->require_admin_approval) {
+        if (! empty($validated['duty_exchange_user_id'])) {
+            $exchangeUser = $leaveRequest->dutyExchangeUser;
+
+            if ($exchangeUser) {
+                $exchangeUser->notify(new DutyExchangeRequestNotification($leaveRequest));
+            }
+        } elseif (auth()->user()->isDepartmentHead() || auth()->user()->require_admin_approval) {
             User::where('role', 'admin')
                 ->whereIn('id', AdminAssignment::select('admin_id'))
                 ->get()
@@ -314,6 +322,10 @@ class LeaveRequestController extends Controller
             }
         }
 
+        $originalDutyExchangeStatus = $leaveRequest->duty_exchange_status;
+        $originalDutyExchangeUserId = $leaveRequest->duty_exchange_user_id;
+        $wasPending = $leaveRequest->isPending();
+
         $leaveRequest->update([
             'leave_type_id' => $validated['leave_type_id'],
             'start_date' => $validated['start_date'],
@@ -346,6 +358,26 @@ class LeaveRequestController extends Controller
                 Storage::disk('public')->delete($path);
             }
             $leaveRequest->update(['attachment_path' => null]);
+        }
+
+        $hasDutyExchange = ! empty($validated['duty_exchange_user_id']);
+
+        if ($hasDutyExchange && $wasPending && $leaveRequest->duty_exchange_status !== 'accepted' && $leaveRequest->duty_exchange_status !== 'rejected') {
+            if ($originalDutyExchangeStatus === null || $originalDutyExchangeUserId != $validated['duty_exchange_user_id']) {
+                $leaveRequest->update(['duty_exchange_status' => 'pending']);
+
+                $exchangeUser = $leaveRequest->dutyExchangeUser;
+
+                if ($exchangeUser) {
+                    $exchangeUser->notify(new DutyExchangeRequestNotification($leaveRequest));
+                }
+            }
+        } elseif (! $hasDutyExchange) {
+            $leaveRequest->update([
+                'duty_exchange_status' => null,
+                'duty_exchange_confirmed_at' => null,
+                'duty_exchange_remarks' => null,
+            ]);
         }
 
         $departmentHead = $leaveRequest->user->department?->head;

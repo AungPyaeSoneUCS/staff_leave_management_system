@@ -14,6 +14,7 @@ use App\Http\Controllers\DepartmentHead\ApprovalController as DepartmentHeadAppr
 use App\Http\Controllers\DepartmentHead\DashboardController as DepartmentHeadDashboardController;
 use App\Http\Controllers\DepartmentHead\ProfileController as DepartmentProfileController;
 use App\Http\Controllers\DepartmentHead\StaffController;
+use App\Http\Controllers\DutyExchangeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Staff\CalendarController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
@@ -139,6 +140,13 @@ Route::middleware('auth')->group(function () {
 
         return redirect('/');
     })->name('logout');
+
+    Route::prefix('duty-exchange')->name('duty-exchange.')->middleware('role:staff,department_head')->group(function () {
+        Route::get('/', [DutyExchangeController::class, 'index'])->name('index');
+        Route::get('/{leave_request}', [DutyExchangeController::class, 'show'])->name('show');
+        Route::post('/{leave_request}/accept', [DutyExchangeController::class, 'accept'])->name('accept');
+        Route::post('/{leave_request}/reject', [DutyExchangeController::class, 'reject'])->name('reject');
+    });
 
     Route::prefix('staff')->name('staff.')->middleware('role:staff')->group(function () {
         Route::get('/dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');

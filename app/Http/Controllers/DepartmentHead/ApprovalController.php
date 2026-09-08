@@ -25,6 +25,11 @@ class ApprovalController extends Controller
 
         $query = LeaveRequest::where('status', 'pending')
             ->where('current_approval_level', 1)
+            ->where(function ($query) {
+                $query->whereNull('duty_exchange_user_id')
+                    ->orWhereNull('duty_exchange_status')
+                    ->orWhere('duty_exchange_status', '!=', 'pending');
+            })
             ->whereHas('user', function ($query) use ($departmentId) {
                 $query->where('department_id', $departmentId)
                     ->where('require_admin_approval', false);
