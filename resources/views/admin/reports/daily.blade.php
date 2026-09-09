@@ -19,9 +19,9 @@
             <input type="hidden" name="end_date" value="{{ now()->format('Y-m-d') }}">
 
             <div class="flex gap-2 shrink-0">
-                <button type="submit" id="daily-export-btn" class="cu-btn-secondary whitespace-nowrap">{{ __('common.export') }} {{ __('common.export_pdf') }}</button>
+                <button type="submit" id="daily-export-btn" class="cu-btn-secondary whitespace-nowrap">{{ __('common.export_pdf') }}</button>
                 <button type="submit" form="daily-report-form" formaction="{{ route('admin.reports.export-xlsx') }}"
-                    class="cu-btn-secondary whitespace-nowrap">{{ __('common.export') }} {{ __('common.export_xlsx') }}</button>
+                    class="cu-btn-secondary whitespace-nowrap">{{ __('common.export_xlsx') }}</button>
             </div>
         </form>
     </div>

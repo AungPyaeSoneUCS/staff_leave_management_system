@@ -21,9 +21,9 @@
             <div class="flex gap-2 shrink-0">
                 <button type="button" id="dept-leave-today-btn" class="cu-btn-secondary whitespace-nowrap">{{ __('common.today') }}</button>
                 <button type="button" id="dept-leave-search-btn" class="cu-btn-primary whitespace-nowrap">{{ __('common.search') }}</button>
-                <button type="submit" id="dept-leave-export-btn" class="cu-btn-secondary whitespace-nowrap">{{ __('common.export') }} {{ __('common.export_pdf') }}</button>
+                <button type="submit" id="dept-leave-export-btn" class="cu-btn-secondary whitespace-nowrap">{{ __('common.export_pdf') }}</button>
                 <button type="submit" form="department-head-leave-form" formaction="{{ route('department-head.reports.export-xlsx') }}"
-                    class="cu-btn-secondary whitespace-nowrap">{{ __('common.export') }} {{ __('common.export_xlsx') }}</button>
+                    class="cu-btn-secondary whitespace-nowrap">{{ __('common.export_xlsx') }}</button>
             </div>
         </form>
     </div>

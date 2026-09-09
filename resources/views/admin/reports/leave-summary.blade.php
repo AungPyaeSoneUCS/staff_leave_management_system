@@ -48,9 +48,9 @@
                         <button type="button" id="summary-search-btn"
                             class="cu-btn-primary whitespace-nowrap">{{ __('common.search') }}</button>
                         <button type="submit" id="summary-export-btn"
-                            class="cu-btn-secondary whitespace-nowrap">{{ __('common.export') }} {{ __('common.export_pdf') }}</button>
+                            class="cu-btn-secondary whitespace-nowrap">{{ __('common.export_pdf') }}</button>
                         <button type="submit" form="leave-summary-form" formaction="{{ route('admin.reports.export-xlsx') }}"
-                            class="cu-btn-secondary whitespace-nowrap">{{ __('common.export') }} {{ __('common.export_xlsx') }}</button>
+                            class="cu-btn-secondary whitespace-nowrap">{{ __('common.export_xlsx') }}</button>
                     </div>
                 </form>
             </div>
