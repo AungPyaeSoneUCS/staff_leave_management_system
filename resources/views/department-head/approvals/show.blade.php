@@ -119,8 +119,9 @@
             </div>
         @endif
 
-        <div class="border-t border-slate-100 pt-6">
-            <h3 class="cu-section-title mb-4">{{ __('common.review_details') }}</h3>
+        @if($leaveRequest->reviewer)
+            <div class="border-t border-slate-100 pt-6">
+                <h3 class="cu-section-title mb-4">{{ __('common.review_details') }}</h3>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm text-left">
                     <thead>
@@ -209,6 +210,7 @@
                 </div>
             @endif
         </div>
+        @endif
 
         @if($leaveRequest->isPending() && $leaveRequest->current_approval_level === 1)
             <div class="border-t border-slate-100 pt-6">

@@ -575,64 +575,83 @@
                 @if (! empty($chart) && ! empty($chart['labels']))
                     @php
                         $labels = $chart['labels'];
-                        $values = array_map('floatval', $chart['values']);
                         $colors = $chart['colors'] ?? array_fill(0, count($labels), '#3b82f6');
-                        $maxVal = max($values) ?: 1;
-                        $count = count($labels);
-
-                        $svgW = 540;
-                        $svgH = 240;
-                        $padL = 42;
-                        $padR = 16;
-                        $padT = 24;
-                        $padB = 58;
-                        $plotW = $svgW - $padL - $padR;
-                        $plotH = $svgH - $padT - $padB;
-                        $slot = $plotW / max($count, 1);
-                        $barW = min(42, max(14, $slot * 0.55));
+                        $datasets = [
+                            [
+                                'title' => __('common.staff_count'),
+                                'values' => array_map('floatval', $chart['staff_values'] ?? []),
+                                'unit' => '',
+                            ],
+                            [
+                                'title' => __('common.total_days'),
+                                'values' => array_map('floatval', $chart['values']),
+                                'unit' => __('common.days'),
+                            ],
+                        ];
                     @endphp
-                    <div class="chart-section">
-                        <div class="chart-title">{{ __('admin.department_report') }}</div>
-                        <div class="chart-wrap">
-                            <svg width="{{ $svgW }}" height="{{ $svgH }}" viewBox="0 0 {{ $svgW }} {{ $svgH }}" xmlns="http://www.w3.org/2000/svg">
-                                @for ($i = 0; $i <= 4; $i++)
-                                    @php
-                                        $y = $padT + ($plotH * $i / 4);
-                                        $tick = round($maxVal * (1 - $i / 4), 1);
-                                    @endphp
-                                    <line x1="{{ $padL }}" y1="{{ $y }}" x2="{{ $svgW - $padR }}" y2="{{ $y }}" stroke="#e2e8f0" stroke-width="1"/>
-                                    <text x="{{ $padL - 6 }}" y="{{ $y + 3 }}" text-anchor="end" font-size="8" fill="#64748b" font-family="notosansmyanmar">{{ $tick }}</text>
-                                @endfor
+                    @foreach ($datasets as $ds)
+                        @if (empty($ds['values']) || count($ds['values']) !== count($labels))
+                            @continue
+                        @endif
+                        @php
+                            $values = $ds['values'];
+                            $maxVal = max($values) ?: 1;
+                            $count = count($labels);
 
-                                <line x1="{{ $padL }}" y1="{{ $padT }}" x2="{{ $padL }}" y2="{{ $padT + $plotH }}" stroke="#94a3b8" stroke-width="1"/>
-                                <line x1="{{ $padL }}" y1="{{ $padT + $plotH }}" x2="{{ $svgW - $padR }}" y2="{{ $padT + $plotH }}" stroke="#94a3b8" stroke-width="1"/>
+                            $svgW = 540;
+                            $svgH = 240;
+                            $padL = 42;
+                            $padR = 16;
+                            $padT = 24;
+                            $padB = 58;
+                            $plotW = $svgW - $padL - $padR;
+                            $plotH = $svgH - $padT - $padB;
+                            $slot = $plotW / max($count, 1);
+                            $barW = min(42, max(14, $slot * 0.55));
+                        @endphp
+                        <div class="chart-section">
+                            <div class="chart-title">{{ $ds['title'] }}</div>
+                            <div class="chart-wrap">
+                                <svg width="{{ $svgW }}" height="{{ $svgH }}" viewBox="0 0 {{ $svgW }} {{ $svgH }}" xmlns="http://www.w3.org/2000/svg">
+                                    @for ($i = 0; $i <= 4; $i++)
+                                        @php
+                                            $y = $padT + ($plotH * $i / 4);
+                                            $tick = round($maxVal * (1 - $i / 4), 1);
+                                        @endphp
+                                        <line x1="{{ $padL }}" y1="{{ $y }}" x2="{{ $svgW - $padR }}" y2="{{ $y }}" stroke="#e2e8f0" stroke-width="1"/>
+                                        <text x="{{ $padL - 6 }}" y="{{ $y + 3 }}" text-anchor="end" font-size="8" fill="#64748b" font-family="notosansmyanmar">{{ $tick }}</text>
+                                    @endfor
 
-                                @foreach ($labels as $idx => $label)
-                                    @php
-                                        $value = (float) $values[$idx];
-                                        $barH = ($value / $maxVal) * $plotH;
-                                        $x = $padL + ($idx * $slot) + (($slot - $barW) / 2);
-                                        $y = $padT + $plotH - $barH;
-                                        $color = $colors[$idx] ?? '#3b82f6';
-                                        $shortLabel = mb_strlen($label) > 12 ? mb_substr($label, 0, 11).'…' : $label;
-                                    @endphp
-                                    <rect x="{{ round($x, 2) }}" y="{{ round($y, 2) }}" width="{{ round($barW, 2) }}" height="{{ round(max($barH, 0), 2) }}" fill="{{ $color }}" rx="2"/>
-                                    <text x="{{ round($x + $barW / 2, 2) }}" y="{{ round($y - 4, 2) }}" text-anchor="middle" font-size="8" fill="#334155" font-weight="bold" font-family="notosansmyanmar">{{ $value }}</text>
-                                    <text x="{{ round($x + $barW / 2, 2) }}" y="{{ $padT + $plotH + 14 }}" text-anchor="middle" font-size="7" fill="#475569" font-family="notosansmyanmar">{{ $shortLabel }}</text>
-                                @endforeach
-                            </svg>
+                                    <line x1="{{ $padL }}" y1="{{ $padT }}" x2="{{ $padL }}" y2="{{ $padT + $plotH }}" stroke="#94a3b8" stroke-width="1"/>
+                                    <line x1="{{ $padL }}" y1="{{ $padT + $plotH }}" x2="{{ $svgW - $padR }}" y2="{{ $padT + $plotH }}" stroke="#94a3b8" stroke-width="1"/>
+
+                                    @foreach ($labels as $idx => $label)
+                                        @php
+                                            $value = (float) $values[$idx];
+                                            $barH = ($value / $maxVal) * $plotH;
+                                            $x = $padL + ($idx * $slot) + (($slot - $barW) / 2);
+                                            $y = $padT + $plotH - $barH;
+                                            $color = $colors[$idx] ?? '#3b82f6';
+                                            $shortLabel = mb_strlen($label) > 12 ? mb_substr($label, 0, 11).'…' : $label;
+                                        @endphp
+                                        <rect x="{{ round($x, 2) }}" y="{{ round($y, 2) }}" width="{{ round($barW, 2) }}" height="{{ round(max($barH, 0), 2) }}" fill="{{ $color }}" rx="2"/>
+                                        <text x="{{ round($x + $barW / 2, 2) }}" y="{{ round($y - 4, 2) }}" text-anchor="middle" font-size="8" fill="#334155" font-weight="bold" font-family="notosansmyanmar">{{ $value }}</text>
+                                        <text x="{{ round($x + $barW / 2, 2) }}" y="{{ $padT + $plotH + 14 }}" text-anchor="middle" font-size="7" fill="#475569" font-family="notosansmyanmar">{{ $shortLabel }}</text>
+                                    @endforeach
+                                </svg>
+                            </div>
+                            <table class="chart-legend">
+                                <tr>
+                                    @foreach ($labels as $idx => $label)
+                                        <td>
+                                            <span class="legend-swatch" style="background: {{ $colors[$idx] ?? '#3b82f6' }};"></span>
+                                            {{ $label }}: {{ $values[$idx] }} {{ $ds['unit'] }}
+                                        </td>
+                                    @endforeach
+                                </tr>
+                            </table>
                         </div>
-                        <table class="chart-legend">
-                            <tr>
-                                @foreach ($labels as $idx => $label)
-                                    <td>
-                                        <span class="legend-swatch" style="background: {{ $colors[$idx] ?? '#3b82f6' }};"></span>
-                                        {{ $label }}: {{ $values[$idx] }} {{ __('common.days') }}
-                                    </td>
-                                @endforeach
-                            </tr>
-                        </table>
-                    </div>
+                    @endforeach
                 @endif
                 <table>
                     <thead>
