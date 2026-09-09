@@ -56,7 +56,7 @@
             </div>
 
             <div class="flex justify-end gap-3">
-                <a href="{{ route('admin.departments.index') }}" class="cu-btn-secondary">{{ __('common.cancel') }}</a>
+                <a href="{{ route('admin.departments.index') }}" class="cu-btn-amber-nude">{{ __('common.cancel') }}</a>
                 <button type="submit" class="cu-btn-primary">{{ __('admin.create_department') }}</button>
             </div>
         </form>

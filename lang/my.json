@@ -441,6 +441,7 @@
     "auth.password_label": "စကားဝှက်",
     "auth.remember_me": "မှတ်ထားပါ",
     "auth.sign_in_button": "အကောင့်ဝင်ရန်",
+    "auth.log_in_button": "အကောင့်ဝင်ရန်",
     "auth.demo_credentials": "စမ်းသပ် အကောင့်အချက်အလက်များ",
     "auth.forgot_title": "စကားဝှက် မေ့သွားသည် — ကွန်ပျူတာတက္ကသိုလ် ခွင့်စီမံခန့်ခွဲမှု",
     "auth.forgot_heading": "စကားဝှက် မေ့သွားပါသလား",

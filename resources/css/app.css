@@ -169,6 +169,14 @@
         @apply inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none text-primary-700 hover:bg-primary-50 focus-visible:ring-primary-500;
     }
 
+    .cu-btn-amber-nude {
+        @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-amber-700 bg-amber-50 border border-amber-200 shadow-sm shadow-amber-600/10 transition-all duration-150 hover:bg-amber-100 hover:border-amber-300 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40 disabled:opacity-50 disabled:pointer-events-none;
+    }
+
+    .cu-btn-danger-nude {
+        @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-rose-700 bg-rose-50 border border-rose-200 shadow-sm shadow-rose-600/10 transition-all duration-150 hover:bg-rose-100 hover:border-rose-300 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400/40 disabled:opacity-50 disabled:pointer-events-none;
+    }
+
     .cu-link {
         @apply font-medium text-primary-700 hover:text-primary-900 underline-offset-2 hover:underline transition-colors;
     }

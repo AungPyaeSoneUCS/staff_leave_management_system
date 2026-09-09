@@ -205,7 +205,7 @@
                 <form action="{{ route('department-head.leave-requests.cancel', $leaveRequest) }}" method="POST">
                     @csrf
                     <button type="submit"
-                            class="cu-btn-danger"
+                            class="cu-btn-amber-nude"
                             data-confirm="{{ __('staff.are_you_sure_cancel') }}">
                         {{ __('staff.cancel_request') }}
                     </button>

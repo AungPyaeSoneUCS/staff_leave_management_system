@@ -88,7 +88,7 @@
             <x-signature-pad targets="leave-request-form" :required="true" />
 
             <div class="flex justify-end gap-3">
-                <a href="{{ route('department-head.leave-requests.index') }}" class="cu-btn-secondary">{{ __('common.cancel') }}</a>
+                <a href="{{ route('department-head.leave-requests.index') }}" class="cu-btn-amber-nude">{{ __('common.cancel') }}</a>
                 <button type="submit" class="cu-btn-primary">{{ __('common.submit') }}</button>
             </div>
         </form>

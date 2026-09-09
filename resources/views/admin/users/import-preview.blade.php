@@ -96,7 +96,7 @@
             </div>
 
             <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
-                <a href="{{ route('admin.users.index') }}" class="cu-btn-secondary">{{ __('common.cancel') }}</a>
+                <a href="{{ route('admin.users.index') }}" class="cu-btn-amber-nude">{{ __('common.cancel') }}</a>
                 <button type="submit" class="cu-btn-primary">{{ __('admin.confirm_import') }}</button>
             </div>
         </form>

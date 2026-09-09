@@ -66,7 +66,7 @@
                                 <form action="{{ route('super-admin.admins.destroy', $admin) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="cu-btn-danger !px-3 !py-1.5 !rounded-full text-xs"
+                                    <button type="submit" class="cu-btn-danger-nude !px-3 !py-1.5 text-xs"
                                             data-confirm="{{ __('super_admin.delete_this_admin') }}">{{ __('common.delete') }}</button>
                                 </form>
                             @endif

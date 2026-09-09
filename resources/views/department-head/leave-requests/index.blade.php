@@ -111,12 +111,12 @@
                                 @if($request->isPending())
                                     <form action="{{ route('department-head.leave-requests.cancel', $request) }}" method="POST" class="inline">
                                         @csrf
-                                        <button type="submit" class="cu-btn-danger !px-3 !py-1.5 !rounded-full text-xs" data-confirm="{{ __('staff.cancel_this_request') }}">{{ __('common.cancel') }}</button>
+                                        <button type="submit" class="cu-btn-amber-nude !px-3 !py-1.5 text-xs" data-confirm="{{ __('staff.cancel_this_request') }}">{{ __('common.cancel') }}</button>
                                     </form>
                                     <form action="{{ route('department-head.leave-requests.destroy', $request) }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="cu-btn-danger !px-3 !py-1.5 !rounded-full text-xs" data-confirm="{{ __('staff.delete_this_request') }}">{{ __('common.delete') }}</button>
+                                        <button type="submit" class="cu-btn-danger-nude !px-3 !py-1.5 text-xs" data-confirm="{{ __('staff.delete_this_request') }}">{{ __('common.delete') }}</button>
                                     </form>
                                 @endif
                             </td>

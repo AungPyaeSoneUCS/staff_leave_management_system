@@ -147,8 +147,8 @@
             </div>
 
             <div class="flex justify-end gap-3">
-                <button type="button" onclick="deleteHoliday()" id="delete-btn" class="cu-btn-danger hidden">{{ __('common.delete') }}</button>
-                <button type="button" onclick="closeModal()" class="cu-btn-secondary">{{ __('common.cancel') }}</button>
+                <button type="button" onclick="deleteHoliday()" id="delete-btn" class="cu-btn-danger-nude hidden">{{ __('common.delete') }}</button>
+                <button type="button" onclick="closeModal()" class="cu-btn-amber-nude">{{ __('common.cancel') }}</button>
                 <button type="submit" class="cu-btn-primary">{{ __('common.save') }}</button>
             </div>
         </form>

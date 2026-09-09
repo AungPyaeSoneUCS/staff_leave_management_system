@@ -138,7 +138,7 @@
             </div>
 
             <div class="flex justify-end gap-3 mt-4 pt-3 border-t border-slate-100">
-                <a href="{{ route('admin.dashboard') }}" class="cu-btn-secondary text-sm py-1.5 px-4">{{ __('common.cancel') }}</a>
+                <a href="{{ route('admin.dashboard') }}" class="cu-btn-amber-nude">{{ __('common.cancel') }}</a>
                 <button type="submit" class="cu-btn-primary text-sm py-1.5 px-4">{{ __('common.save') }}</button>
             </div>
         </form>

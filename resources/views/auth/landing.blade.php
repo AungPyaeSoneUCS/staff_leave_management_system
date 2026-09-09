@@ -51,7 +51,7 @@
 
                 <div class="mt-8">
                     <a href="{{ route('login') }}" class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-teal-700 to-emerald-700 px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-teal-800/20 transition hover:-translate-y-0.5 hover:from-teal-800 hover:to-emerald-800">
-                        {{ __('auth.sign_in_title') }}
+                        {{ __('auth.log_in_button') }}
                     </a>
                 </div>
             </div>

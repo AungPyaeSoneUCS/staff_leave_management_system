@@ -442,6 +442,7 @@
     "auth.password_label": "Password",
     "auth.remember_me": "Remember me",
     "auth.sign_in_button": "Sign in",
+    "auth.log_in_button": "Sign In",
     "auth.select_role_n_login": "Select Role and login to continue the Management Dashboard.",
     "auth.demo_credentials": "Demo credentials",
     "auth.forgot_title": "Forgot Password — Computer University Leave",

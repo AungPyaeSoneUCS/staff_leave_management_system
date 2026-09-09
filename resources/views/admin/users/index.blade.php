@@ -38,7 +38,7 @@
                     </div>
                     <div class="flex justify-end gap-3">
                         <a href="{{ route('admin.users.import-template') }}" class="cu-btn-secondary text-sm">{{ __('admin.download_template') }}</a>
-                        <button type="button" onclick="document.getElementById('import-modal').classList.add('hidden')" class="cu-btn-secondary">{{ __('common.cancel') }}</button>
+                        <button type="button" onclick="document.getElementById('import-modal').classList.add('hidden')" class="cu-btn-amber-nude">{{ __('common.cancel') }}</button>
                         <button type="submit" class="cu-btn-primary">{{ __('common.next') }}</button>
                     </div>
                 </form>
@@ -184,7 +184,7 @@
                                 <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="cu-btn-danger !px-3 !py-1.5 !rounded-full text-xs"
+                                    <button type="submit" class="cu-btn-danger-nude !px-3 !py-1.5 text-xs"
                                             data-confirm="{{ __('admin.delete_this_user') }}">{{ __('common.delete') }}</button>
                                 </form>
                             @endif

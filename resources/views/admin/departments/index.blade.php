@@ -39,7 +39,7 @@
                             <form action="{{ route('admin.departments.destroy', $department) }}" method="POST" class="inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="cu-btn-danger !px-3 !py-1.5 !rounded-full text-xs"
+                                <button type="submit" class="cu-btn-danger-nude !px-3 !py-1.5 text-xs"
                                         data-confirm="{{ __('admin.delete_this_department') }}">{{ __('common.delete') }}</button>
                             </form>
                         </td>

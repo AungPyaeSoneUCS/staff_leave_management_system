@@ -75,7 +75,7 @@
             </div>
 
             <div class="flex justify-end gap-3">
-                <a href="{{ route('staff.leave-requests.show', $leaveRequest) }}" class="cu-btn-secondary">{{ __('common.cancel') }}</a>
+                <a href="{{ route('staff.leave-requests.show', $leaveRequest) }}" class="cu-btn-amber-nude">{{ __('common.cancel') }}</a>
                 <button type="submit" class="cu-btn-primary">{{ __('common.save') }}</button>
             </div>
         </form>

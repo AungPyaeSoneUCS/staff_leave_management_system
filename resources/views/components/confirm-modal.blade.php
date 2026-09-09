@@ -20,7 +20,7 @@
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-2 bg-slate-50/80 px-4 py-3 sm:px-6 border-t border-slate-100">
-                    <button type="button" class="cu-btn-secondary" onclick="closeConfirmModal()">{{ __('common.cancel') }}</button>
+                    <button type="button" class="cu-btn-amber-nude" onclick="closeConfirmModal()">{{ __('common.cancel') }}</button>
                     <button type="button" id="confirm-modal-confirm-btn" class="cu-btn-danger" onclick="confirmConfirmModal()">{{ __('common.yes') }}</button>
                 </div>
             </div>

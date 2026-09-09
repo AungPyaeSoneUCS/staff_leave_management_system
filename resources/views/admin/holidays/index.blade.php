@@ -86,7 +86,7 @@
                                     <form action="{{ route('admin.holidays.destroy', $holiday) }}" method="POST" class="inline" data-confirm="{{ __('admin.delete_holiday_confirm') }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="cu-btn-danger !px-3 !py-1.5 !rounded-full text-xs">{{ __('common.delete') }}</button>
+                                        <button type="submit" class="cu-btn-danger-nude !px-3 !py-1.5 text-xs">{{ __('common.delete') }}</button>
                                     </form>
                                 </td>
                             </tr>
