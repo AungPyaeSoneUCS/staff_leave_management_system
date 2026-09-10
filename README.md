@@ -1,4 +1,3 @@
-```markdown
 # Staff Leave Management System
 
 A comprehensive web-based Staff Leave Management System built with Laravel, MySQL, Nginx, and Tailwind CSS. Designed to streamline leave requests, approvals, department management, and administrative workflows for educational institutions.
