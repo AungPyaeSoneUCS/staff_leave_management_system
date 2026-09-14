@@ -438,6 +438,19 @@ class UserController extends Controller
         $callback = function () use ($headers) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $headers);
+            fputcsv($file, [
+                'Sample Staff',
+                'စံပြ၀န်ထမ်း',
+                'sample.staff@example.com',
+                'password123',
+                'staff',
+                'Faculty of Information Science',
+                'CUM-ST-0001',
+                '09-123456789',
+                'Assistant Lecturer',
+                'လ/ထ ကထိက',
+                'no',
+            ]);
             fclose($file);
         };
 

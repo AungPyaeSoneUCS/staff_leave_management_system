@@ -10,6 +10,7 @@ use App\Notifications\LeaveRequestSubmittedNotification;
 use App\Services\LeaveWorkflowService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class ApprovalController extends Controller
 {
@@ -123,7 +124,7 @@ class ApprovalController extends Controller
         return view('central-admin.approvals.show', compact('leaveRequest'));
     }
 
-    public function history()
+    public function history(Request $request)
     {
         $processedRequests = LeaveRequest::where(function ($query) {
             if (auth()->user()->isSuperAdmin()) {
@@ -134,9 +135,26 @@ class ApprovalController extends Controller
                     ->orWhere('cancelled_by_id', auth()->id());
             }
         })
+            ->when($search = $request->query('search'), function ($query) use ($search) {
+                $query->whereHas('user', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('name_mm', 'like', "%{$search}%")
+                        ->orWhere('staff_id', 'like', "%{$search}%");
+                });
+            })
+            ->when($leaveTypeId = $request->query('leave_type_id'), function ($query) use ($leaveTypeId) {
+                $query->where('leave_type_id', $leaveTypeId);
+            })
+            ->when($startDate = $request->query('start_date'), function ($query) use ($startDate) {
+                $query->whereDate('start_date', '>=', $startDate);
+            })
+            ->when($endDate = $request->query('end_date'), function ($query) use ($endDate) {
+                $query->whereDate('end_date', '<=', $endDate);
+            })
             ->with('user', 'leaveType', 'user.department', 'dutyExchangeUser')
             ->latest()
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         return view('central-admin.approvals.history', compact('processedRequests'));
     }
@@ -208,5 +226,55 @@ class ApprovalController extends Controller
 
         return redirect()->route('central-admin.approvals.pending')
             ->with('success', __('flash.revoke_success'));
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $validated = $request->validate([
+            'selected' => 'required|array',
+            'selected.*' => 'exists:leave_requests,id',
+        ]);
+
+        $deleted = 0;
+
+        foreach ($validated['selected'] as $requestId) {
+            $leaveRequest = LeaveRequest::find($requestId);
+
+            if (! $leaveRequest || Gate::denies('delete', $leaveRequest)) {
+                continue;
+            }
+
+            if ($leaveRequest->attachment_path) {
+                $paths = json_decode($leaveRequest->attachment_path, true) ?: [];
+                foreach ($paths as $path) {
+                    Storage::disk('public')->delete($path);
+                }
+            }
+
+            $leaveRequest->delete();
+            $deleted++;
+        }
+
+        return redirect()->route('central-admin.approvals.history')
+            ->with('success', __('flash.bulk_deleted', ['count' => $deleted]));
+    }
+
+    public function destroy(LeaveRequest $leaveRequest)
+    {
+        if (Gate::denies('delete', $leaveRequest)) {
+            abort(403);
+        }
+
+        if ($leaveRequest->attachment_path) {
+            $paths = json_decode($leaveRequest->attachment_path, true) ?: [];
+            foreach ($paths as $path) {
+                Storage::disk('public')->delete($path);
+            }
+        }
+
+        $leaveRequest->delete();
+
+        return redirect()->route('central-admin.approvals.history')
+            ->with('success', __('flash.request_deleted'));
     }
 }

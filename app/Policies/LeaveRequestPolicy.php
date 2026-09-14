@@ -46,6 +46,14 @@ class LeaveRequestPolicy
 
     public function delete(User $user, LeaveRequest $leaveRequest): bool
     {
+        if ($user->isSuperAdmin() || $user->isAdmin()) {
+            return in_array($user->id, [
+                $leaveRequest->hr_id,
+                $leaveRequest->super_admin_id,
+                $leaveRequest->cancelled_by_id,
+            ], true);
+        }
+
         return $user->id === $leaveRequest->user_id && $leaveRequest->isPending();
     }
 

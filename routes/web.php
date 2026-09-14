@@ -184,9 +184,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/approvals/history', [CentralAdminApprovalController::class, 'history'])->name('approvals.history');
         Route::get('/approvals/{leave_request}', [CentralAdminApprovalController::class, 'show'])->name('approvals.show');
         Route::post('/approvals/bulk', [CentralAdminApprovalController::class, 'bulk'])->name('approvals.bulk');
+        Route::post('/approvals/bulk-delete', [CentralAdminApprovalController::class, 'bulkDestroy'])->name('approvals.bulk-destroy');
         Route::post('/approvals/{leave_request}/approve', [CentralAdminApprovalController::class, 'approve'])->name('approvals.approve');
         Route::post('/approvals/{leave_request}/reject', [CentralAdminApprovalController::class, 'reject'])->name('approvals.reject');
         Route::post('/approvals/{leave_request}/revoke', [CentralAdminApprovalController::class, 'revoke'])->name('approvals.revoke');
+        Route::delete('/approvals/{leave_request}', [CentralAdminApprovalController::class, 'destroy'])->name('approvals.destroy');
     });
 
     Route::prefix('admin')->name('admin.')->middleware('role:admin,super_admin')->group(function () {
@@ -229,6 +231,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports/leave-type-data', [AdminDashboardController::class, 'getLeaveTypeData'])->name('reports.leave-type-data');
         Route::get('/reports/department-data', [AdminDashboardController::class, 'getDepartmentData'])->name('reports.department-data');
         Route::get('/reports/daily-data', [AdminDashboardController::class, 'getDailyReportData'])->name('reports.daily-data');
+        Route::post('/reports/purge-history', [AdminDashboardController::class, 'purgeHistory'])->name('reports.purge-history');
         Route::get('/profile', [AdminProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
         Route::get('/staff', [AdminStaffController::class, 'index'])->name('staff.index');

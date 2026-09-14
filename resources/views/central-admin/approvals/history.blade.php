@@ -11,10 +11,60 @@
         </div>
     </div>
 
-    <div class="cu-table-wrap overflow-x-auto">
-        <table class="cu-table">
+    <div class="cu-card cu-card-body">
+        <form method="GET" action="{{ route('central-admin.approvals.history') }}">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label class="cu-label text-xs">{{ __('central_admin.staff_label') }}</label>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('central_admin.search_name_staff') }}" list="history-staff-suggestions" class="cu-input">
+                    <datalist id="history-staff-suggestions">
+                        @foreach(\App\Models\User::whereIn('role', ['staff', 'department_head'])->orderBy('name')->get(['name', 'name_mm', 'staff_id']) as $staffer)
+                            <option value="{{ app()->getLocale() == 'my' ? ($staffer->name_mm ?? $staffer->name) : $staffer->name }}"></option>
+                            <option value="{{ $staffer->staff_id }}"></option>
+                        @endforeach
+                    </datalist>
+                </div>
+                <div>
+                    <label class="cu-label text-xs">{{ __('common.leave_type') }}</label>
+                    <select name="leave_type_id" class="cu-select">
+                        <option value="">{{ __('common.all_leave_types') }}</option>
+                        @foreach(\App\Models\LeaveType::where('is_active', true)->get() as $type)
+                            <option value="{{ $type->id }}" {{ request('leave_type_id') == $type->id ? 'selected' : '' }}>
+                                {{ app()->getLocale() == 'my' ? $type->name_mm ?? $type->name : $type->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="cu-label text-xs">{{ __('common.start_date') }}</label>
+                    <input type="date" name="start_date" value="{{ request('start_date') }}" class="cu-input">
+                </div>
+                <div>
+                    <label class="cu-label text-xs">{{ __('common.end_date') }}</label>
+                    <input type="date" name="end_date" value="{{ request('end_date') }}" class="cu-input">
+                </div>
+            </div>
+            <div class="mt-4 flex flex-wrap gap-2">
+                <button type="submit" class="cu-btn-secondary">{{ __('common.filter') }}</button>
+                <a href="{{ route('central-admin.approvals.history') }}" class="cu-btn-amber-nude">{{ __('common.reset') }}</a>
+            </div>
+        </form>
+    </div>
+
+    <form id="history-bulk-form" action="{{ route('central-admin.approvals.bulk-destroy') }}" method="POST">
+        @csrf
+        <div class="mb-3 flex justify-end">
+            <button type="submit" class="cu-btn-danger-nude"
+                    data-confirm="{{ __('central_admin.confirm_bulk_delete') }}">{{ __('common.delete_selected') }}</button>
+        </div>
+
+        <div class="cu-table-wrap overflow-x-auto">
+            <table class="cu-table">
                 <thead>
                     <tr>
+                        <th width="30" class="text-center">
+                            <input type="checkbox" id="select-all" class="rounded border-slate-300 text-cu-600 focus:ring-cu-500">
+                        </th>
                         <th>{{ __('common.number') }}</th>
                         <th>{{ __('common.name') }}</th>
                         <th>{{ __('common.leave_type') }}</th>
@@ -33,6 +83,9 @@
             <tbody>
                 @foreach($processedRequests as $request)
                     <tr>
+                        <td class="text-center">
+                            <input type="checkbox" name="selected[]" value="{{ $request->id }}" class="row-checkbox rounded border-slate-300 text-cu-600 focus:ring-cu-500">
+                        </td>
                         <td>{{ $loop->iteration }}</td>
                         <td class="primary">
                             <div class="flex items-center gap-2">
@@ -89,7 +142,9 @@
                         </td>
                         <td>{{ $request->reviewed_at ? \App\Support\MyanmarDateFormatter::format($request->reviewed_at, 'F d, Y') : __('common.n_a') }}</td>
                         <td>
-                            <a href="{{ route('central-admin.approvals.show', $request) }}" class="cu-btn-secondary !px-3 !py-1.5 !rounded-full text-xs">{{ __('common.view') }}</a>
+                            <div class="flex items-center justify-center gap-2">
+                                <a href="{{ route('central-admin.approvals.show', $request) }}" class="cu-btn-secondary !px-3 !py-1.5 !rounded-full text-xs">{{ __('common.view') }}</a>
+                            </div>
                         </td>
                     </tr>
                 @endforeach
@@ -100,5 +155,14 @@
     <div class="mt-4">
         {{ $processedRequests->links() }}
     </div>
+</form>
 </div>
+
+@push('scripts')
+<script>
+document.getElementById('select-all')?.addEventListener('change', function(e) {
+    document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = e.target.checked);
+});
+</script>
+@endpush
 @endsection

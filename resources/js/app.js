@@ -32,7 +32,7 @@ document.addEventListener('keydown', function(event) {
 
 let confirmModalResolve = null;
 
-function showConfirmModal(message) {
+function showConfirmModal(message, confirmText) {
     return new Promise(function(resolve) {
         confirmModalResolve = resolve;
         const modal = document.getElementById('confirm-modal');
@@ -45,6 +45,9 @@ function showConfirmModal(message) {
         }
 
         messageEl.textContent = message;
+        if (confirmText) {
+            confirmBtn.textContent = confirmText;
+        }
         modal.classList.remove('hidden');
         confirmBtn.focus();
     });
@@ -85,7 +88,8 @@ document.querySelectorAll('form[data-confirm]').forEach(function(form) {
     function onSubmit(e) {
         e.preventDefault();
         const message = form.getAttribute('data-confirm') || __('common.confirm');
-        showConfirmModal(message).then(function(confirmed) {
+        const confirmText = form.getAttribute('data-confirm-text') || '';
+        showConfirmModal(message, confirmText).then(function(confirmed) {
             if (confirmed) {
                 form.removeEventListener('submit', onSubmit);
                 form.submit();
@@ -102,8 +106,9 @@ document.querySelectorAll('a[data-confirm], button[data-confirm]').forEach(funct
         if (!message) return;
         e.preventDefault();
         const href = el.getAttribute('href');
-        const form = el.closest('form');
-        showConfirmModal(message).then(function(confirmed) {
+        const form = el.closest('form') || document.getElementById(el.getAttribute('form') || '');
+        const confirmText = el.getAttribute('data-confirm-text') || '';
+        showConfirmModal(message, confirmText).then(function(confirmed) {
             if (confirmed) {
                 if (form && form._confirmHandler) {
                     form.removeEventListener('submit', form._confirmHandler);

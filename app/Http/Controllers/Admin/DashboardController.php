@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Mpdf\Config\ConfigVariables;
 use Mpdf\Config\FontVariables;
@@ -159,6 +160,7 @@ class DashboardController extends Controller
         $validated = $request->validate([
             'type' => ['required', Rule::in(['leave_summary', 'balance', 'leave_type', 'department', 'daily'])],
             'department_id' => ['nullable', 'exists:departments,id'],
+            'department_name' => ['nullable', 'string', 'max:255'],
             'staff_name' => ['nullable', 'string', 'max:255'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date'],
@@ -167,7 +169,7 @@ class DashboardController extends Controller
             'date_filter' => ['nullable', 'in:leave_period,created_at,reviewed_at'],
         ]);
 
-        $filters = Arr::only($validated, ['department_id', 'staff_name', 'start_date', 'end_date', 'year', 'leave_type_id', 'date_filter']);
+        $filters = Arr::only($validated, ['department_id', 'department_name', 'staff_name', 'start_date', 'end_date', 'year', 'leave_type_id', 'date_filter']);
 
         $filterSummary = $this->buildFilterSummary($filters);
 
@@ -253,6 +255,7 @@ class DashboardController extends Controller
         $validated = $request->validate([
             'type' => ['required', Rule::in(['leave_summary', 'balance', 'leave_type', 'department', 'daily'])],
             'department_id' => ['nullable', 'exists:departments,id'],
+            'department_name' => ['nullable', 'string', 'max:255'],
             'staff_name' => ['nullable', 'string', 'max:255'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date'],
@@ -261,7 +264,7 @@ class DashboardController extends Controller
             'date_filter' => ['nullable', 'in:leave_period,created_at,reviewed_at'],
         ]);
 
-        $filters = Arr::only($validated, ['department_id', 'staff_name', 'start_date', 'end_date', 'year', 'leave_type_id', 'date_filter']);
+        $filters = Arr::only($validated, ['department_id', 'department_name', 'staff_name', 'start_date', 'end_date', 'year', 'leave_type_id', 'date_filter']);
         $filterSummary = $this->buildFilterSummary($filters);
 
         $title = match ($validated['type']) {
@@ -567,9 +570,11 @@ class DashboardController extends Controller
     public function getLeaveSummaryData(Request $request)
     {
         $filters = $request->validate([
-            'department_id' => ['nullable', 'exists:departments,id'],
+            'department_name' => ['nullable', 'string', 'max:255'],
             'staff_name' => ['nullable', 'string', 'max:255'],
             'status' => ['nullable', 'in:approved,rejected,cancelled,revoked'],
+            'leave_type_id' => ['nullable', 'exists:leave_types,id'],
+            'year' => ['nullable', 'integer', 'min:1900', 'max:2100'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date'],
             'date_filter' => ['nullable', 'in:leave_period,created_at,reviewed_at'],
@@ -579,9 +584,22 @@ class DashboardController extends Controller
         $query = LeaveRequest::query()
             ->with(['user.department', 'leaveType', 'reviewer', 'dutyExchangeUser'])
             ->where('status', '!=', 'pending')
-            ->when(! empty($filters['department_id']), function ($query) use ($filters) {
+            ->when(! empty($filters['leave_type_id']), function ($query) use ($filters) {
+                $query->where('leave_type_id', $filters['leave_type_id']);
+            })
+            ->when(! empty($filters['year']), function ($query) use ($filters) {
+                $query->whereYear('start_date', $filters['year']);
+            })
+            ->when(! empty($filters['department_name']), function ($query) use ($filters) {
                 $query->whereHas('user', function ($q) use ($filters) {
-                    $q->where('department_id', $filters['department_id']);
+                    $q->whereHas('department', function ($dq) use ($filters) {
+                        $dq->where(function ($sub) use ($filters) {
+                            $sub->where('name', 'like', '%'.$filters['department_name'].'%')
+                                ->when(app()->getLocale() === 'my', function ($q2) use ($filters) {
+                                    $q2->orWhere('name_mm', 'like', '%'.$filters['department_name'].'%');
+                                });
+                        });
+                    });
                 });
             })
             ->when(! empty($filters['staff_name']), function ($query) use ($filters) {
@@ -1044,6 +1062,10 @@ class DashboardController extends Controller
             $summary[__('admin.all_departments')] = $department ? $this->localizedName($department->name, $department->name_mm) : __('common.n_a');
         }
 
+        if (! empty($filters['department_name'])) {
+            $summary[__('common.department')] = $filters['department_name'];
+        }
+
         if (! empty($filters['start_date'])) {
             $summary[__('common.start_date')] = $filters['start_date'];
         }
@@ -1062,5 +1084,40 @@ class DashboardController extends Controller
         }
 
         return $summary;
+    }
+
+    public function purgeHistory(Request $request)
+    {
+        if (! auth()->user()->isAdmin() && ! auth()->user()->isSuperAdmin()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'leave_type_id' => 'required|exists:leave_types,id',
+            'year' => 'required|integer|min:2000|max:2100',
+        ]);
+
+        $year = $validated['year'];
+        $leaveTypeId = $validated['leave_type_id'];
+
+        $requests = LeaveRequest::where('leave_type_id', $leaveTypeId)
+            ->whereYear('start_date', $year)
+            ->get();
+        $count = 0;
+
+        foreach ($requests as $lr) {
+            if ($lr->attachment_path) {
+                $paths = json_decode($lr->attachment_path, true) ?: [];
+                foreach ($paths as $path) {
+                    Storage::disk('public')->delete($path);
+                }
+            }
+
+            $lr->delete();
+            $count++;
+        }
+
+        return redirect()->route('admin.reports.leave-summary')
+            ->with('success', __('flash.history_purged', ['year' => $year, 'count' => $count]));
     }
 }
