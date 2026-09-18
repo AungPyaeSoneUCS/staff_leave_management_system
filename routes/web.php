@@ -208,6 +208,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/leave-import', [LeaveImportController::class, 'importPreview'])->name('leave-import.preview');
         Route::post('/leave-import/process', [LeaveImportController::class, 'importProcess'])->name('leave-import.process');
         Route::get('/leave-import/template', [LeaveImportController::class, 'importTemplate'])->name('leave-import.template');
+        Route::get('/leave-records', [AdminDashboardController::class, 'leaveRecords'])->name('leave-records');
+        Route::get('/leave-records/export', [AdminDashboardController::class, 'exportLeaveRecords'])->name('leave-records.export');
+        Route::get('/leave-records/order', [AdminDashboardController::class, 'leaveRecordOrder'])->name('leave-records.order');
+        Route::post('/leave-records/order', [AdminDashboardController::class, 'saveLeaveRecordOrder'])->name('leave-records.order.save');
         Route::get('/holidays', [HolidayController::class, 'index'])->name('holidays.index');
         Route::get('/holidays/calendar', [HolidayController::class, 'calendar'])->name('holidays.calendar');
         Route::post('/holidays', [HolidayController::class, 'store'])->name('holidays.store');

@@ -256,6 +256,14 @@
                             </svg>
                             <span>{{ __('nav.leave_import') }}</span>
                         </a>
+                        <a href="{{ route('admin.leave-records') }}"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('admin.leave-records') ? 'bg-gold-100 text-slate-700' : 'text-white/70 hover:bg-white/5 hover:text-white' }} transition-colors">
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 17H7A2 2 0 015 15V7a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2m-3 1v-5m0 0l-2 2m2-2l2 2"></path>
+                            </svg>
+                            <span>{{ __('nav.leave_records') }}</span>
+                        </a>
                         <a href="{{ route('admin.profile.edit') }}"
                             class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('admin.profile.*') ? 'bg-gold-100 text-slate-700' : 'text-white/70 hover:bg-white/5 hover:text-white' }} transition-colors">
                             <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

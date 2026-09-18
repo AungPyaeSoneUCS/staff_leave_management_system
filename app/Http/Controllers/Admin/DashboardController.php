@@ -7,6 +7,7 @@ use App\Models\Department;
 use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
+use App\Models\StaffOrdering;
 use App\Models\User;
 use App\Services\AnalyticsService;
 use App\Support\MyanmarDateFormatter;
@@ -28,11 +29,21 @@ use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
 use PhpOffice\PhpSpreadsheet\Chart\Title as ChartTitle;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class DashboardController extends Controller
 {
+    private const LEAVE_RECORD_TEMPLATE_ROWS = [
+        ['mm' => 'ရှောင်တခင်ခွင့်', 'en' => 'Casual Leave'],
+        ['mm' => 'ဆေးခွင့်', 'en' => 'Medical Leave'],
+        ['mm' => 'ဆေးလက်မှတ်ပြလုပ်သက်ခွင့်', 'en' => 'Medical Certificate Leave'],
+        ['mm' => 'လုပ်သက်ခွင့်', 'en' => 'Annual Leave'],
+        ['mm' => 'လစာမဲ့ခွင့်', 'en' => 'Unpaid Leave'],
+        ['mm' => 'မီးဖွားခွင့်', 'en' => 'Maternity Leave'],
+    ];
+
     public function __construct(
         private AnalyticsService $analyticsService
     ) {}
@@ -111,6 +122,490 @@ class DashboardController extends Controller
     public function dailyReport()
     {
         return view('admin.reports.daily');
+    }
+
+    public function leaveRecords(Request $request)
+    {
+        $validated = $request->validate([
+            'year' => ['nullable', 'integer', 'min:1900', 'max:2100'],
+            'department_id' => ['nullable', 'exists:departments,id'],
+        ]);
+
+        $year = $validated['year'] ?? (int) now()->year;
+        $departmentId = $validated['department_id'] ?? null;
+
+        $departments = Department::query()
+            ->when($departmentId, fn ($query) => $query->whereKey($departmentId))
+            ->orderBy('id')
+            ->get();
+
+        $books = $departments->map(fn (Department $department) => [
+            'department' => $department,
+            'staff' => $this->leaveRecordBookStaff($department, $year),
+        ]);
+
+        $years = $this->leaveRecordYears();
+
+        $bookTitle = $this->leaveRecordBookTitle($year);
+
+        return view('admin.leave-records.index', compact('books', 'years', 'year', 'departmentId', 'bookTitle'));
+    }
+
+    public function exportLeaveRecords(Request $request)
+    {
+        $validated = $request->validate([
+            'year' => ['nullable', 'integer', 'min:1900', 'max:2100'],
+            'department_id' => ['nullable', 'exists:departments,id'],
+        ]);
+
+        $year = $validated['year'] ?? (int) now()->year;
+        $departmentId = $validated['department_id'] ?? null;
+
+        $departments = Department::query()
+            ->when($departmentId, fn ($query) => $query->whereKey($departmentId))
+            ->orderBy('id')
+            ->get();
+
+        $spreadsheet = new Spreadsheet;
+        $title = $this->leaveRecordBookTitle($year);
+
+        foreach ($departments as $index => $department) {
+            $sheet = $index === 0 ? $spreadsheet->getActiveSheet() : $spreadsheet->createSheet();
+            $this->writeLeaveRecordBookSheet($sheet, $department, $year, $title);
+        }
+
+        $filename = 'leave-records-'.$year.'.xlsx';
+        $writer = new Xlsx($spreadsheet);
+
+        return response()->streamDownload(function () use ($writer) {
+            $writer->save('php://output');
+        }, $filename, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
+    }
+
+    public function leaveRecordOrder()
+    {
+        $departments = Department::query()
+            ->orderBy('id')
+            ->get()
+            ->map(fn (Department $department) => [
+                'department' => $department,
+                'staff' => $this->leaveRecordOrderedStaff($department),
+            ]);
+
+        return view('admin.leave-records.order', compact('departments'));
+    }
+
+    public function saveLeaveRecordOrder(Request $request)
+    {
+        $validated = $request->validate([
+            'order' => ['required', 'array'],
+            'order.*' => ['array'],
+            'order.*.*' => ['integer', 'distinct'],
+        ]);
+
+        foreach ($validated['order'] as $departmentId => $userIds) {
+            $userIds = array_values(array_unique($userIds));
+
+            if ($userIds === []) {
+                continue;
+            }
+
+            $department = Department::find($departmentId);
+            if ($department === null) {
+                continue;
+            }
+
+            $validIds = User::query()
+                ->where('department_id', $department->id)
+                ->whereIn('id', $userIds)
+                ->orderByRaw('FIELD(id,'.implode(',', $userIds).')')
+                ->pluck('id')
+                ->all();
+
+            StaffOrdering::query()->where('department_id', $department->id)->delete();
+
+            foreach ($validIds as $sortOrder => $userId) {
+                StaffOrdering::create([
+                    'department_id' => $department->id,
+                    'user_id' => $userId,
+                    'sort_order' => $sortOrder,
+                ]);
+            }
+        }
+
+        return redirect()->route('admin.leave-records.order')->with('status', __('admin.leave_records_order_saved'));
+    }
+
+    private function leaveRecordTemplateRows(): array
+    {
+        static $rows = null;
+
+        if ($rows === null) {
+            $types = LeaveType::query()->get()->keyBy('name');
+            $rows = array_map(function (array $row) use ($types) {
+                $row['type'] = $types->get($row['en']);
+
+                return $row;
+            }, self::LEAVE_RECORD_TEMPLATE_ROWS);
+        }
+
+        return $rows;
+    }
+
+    private function leaveRecordBookStaff(Department $department, int $year): \Illuminate\Support\Collection
+    {
+        $staff = $this->leaveRecordOrderedStaff($department);
+
+        $recordsByUser = LeaveRequest::query()
+            ->with('leaveType')
+            ->whereHas('user', fn ($query) => $query->where('department_id', $department->id))
+            ->where('status', 'approved')
+            ->whereYear('start_date', $year)
+            ->orderBy('start_date')
+            ->get()
+            ->groupBy('user_id');
+
+        return $staff->map(function (User $user) use ($recordsByUser) {
+            $userRecords = $recordsByUser->get($user->id, collect());
+
+            return [
+                'user' => $user,
+                'rows' => array_map(function (array $row) use ($userRecords) {
+                    $row['dates'] = $row['type'] !== null
+                        ? $userRecords
+                            ->where('leave_type_id', $row['type']->id)
+                            ->filter(fn (LeaveRequest $record) => $record->start_date !== null)
+                            ->take(10)
+                            ->map(fn (LeaveRequest $record) => $record->start_date->format('d/m/Y'))
+                            ->values()
+                            ->all()
+                        : [];
+
+                    return $row;
+                }, $this->leaveRecordTemplateRows()),
+            ];
+        });
+    }
+
+    private function leaveRecordDefaultStaffOrder(Department $department): \Illuminate\Support\Collection
+    {
+        $staff = User::query()
+            ->where('department_id', $department->id)
+            ->get()
+            ->map(fn (User $user) => [
+                'user' => $user,
+                'name' => $this->normalizeLeaveRecordName($user->name_mm ?? $user->name),
+            ]);
+
+        $templateSheets = $this->leaveRecordTemplateStaffOrder();
+        $userNames = $staff->pluck('name')->flip();
+
+        $matchedSheet = null;
+        $bestScore = 0;
+
+        foreach ($templateSheets as $sheetName => $templateNames) {
+            $score = 0;
+            foreach ($templateNames as $templateName) {
+                if ($userNames->has($templateName)) {
+                    $score++;
+                }
+            }
+            if ($score > $bestScore) {
+                $bestScore = $score;
+                $matchedSheet = $sheetName;
+            }
+        }
+
+        $templateNames = $matchedSheet !== null ? $templateSheets[$matchedSheet] : [];
+        $assigned = [];
+        $taken = [];
+
+        foreach ($staff as $dbIndex => $item) {
+            foreach ($templateNames as $templateIndex => $templateName) {
+                if ($item['name'] === $templateName && ! isset($taken[$templateIndex])) {
+                    $assigned[$dbIndex] = $templateIndex;
+                    $taken[$templateIndex] = true;
+                    break;
+                }
+            }
+        }
+
+        foreach ($staff as $dbIndex => $item) {
+            if (isset($assigned[$dbIndex])) {
+                continue;
+            }
+
+            $bestIndex = null;
+            $bestDistance = PHP_INT_MAX;
+            $ties = 0;
+
+            foreach ($templateNames as $templateIndex => $templateName) {
+                if (isset($taken[$templateIndex])) {
+                    continue;
+                }
+
+                $distance = $this->leaveRecordNameDistance($item['name'], $templateName);
+                if ($distance < $bestDistance) {
+                    $bestDistance = $distance;
+                    $bestIndex = $templateIndex;
+                    $ties = 1;
+                } elseif ($distance === $bestDistance) {
+                    $ties++;
+                }
+            }
+
+            if ($bestIndex !== null && $bestDistance <= 4 && $ties === 1) {
+                $assigned[$dbIndex] = $bestIndex;
+                $taken[$bestIndex] = true;
+            }
+        }
+
+        $staff = $staff->map(function (array $item, int $dbIndex) use ($assigned) {
+            $item['order'] = $assigned[$dbIndex] ?? PHP_INT_MAX;
+
+            return $item;
+        });
+
+        return $staff->sort(function (array $a, array $b) {
+            if ($a['order'] !== $b['order']) {
+                return $a['order'] <=> $b['order'];
+            }
+
+            return $a['name'] <=> $b['name'];
+        })->values();
+    }
+
+    private function leaveRecordOrderedStaff(Department $department): \Illuminate\Support\Collection
+    {
+        $default = $this->leaveRecordDefaultStaffOrder($department);
+
+        $customIds = StaffOrdering::query()
+            ->where('department_id', $department->id)
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->pluck('user_id')
+            ->all();
+
+        if ($customIds === []) {
+            return $default->pluck('user');
+        }
+
+        $customSet = array_flip($customIds);
+        $byId = $default->keyBy('user.id');
+
+        $ordered = collect();
+        foreach ($customIds as $userId) {
+            $item = $byId->get($userId);
+            if ($item !== null) {
+                $ordered->push($item['user']);
+            }
+        }
+        foreach ($default as $item) {
+            if (! isset($customSet[$item['user']->id])) {
+                $ordered->push($item['user']);
+            }
+        }
+
+        return $ordered;
+    }
+
+    private function leaveRecordNameDistance(string $a, string $b): int
+    {
+        $aChars = mb_str_split($a);
+        $bChars = mb_str_split($b);
+        $previous = range(0, count($bChars));
+
+        foreach ($aChars as $i => $aChar) {
+            $current = [$i + 1];
+            foreach ($bChars as $j => $bChar) {
+                $cost = $aChar === $bChar ? 0 : 1;
+                $current[$j + 1] = min(
+                    $previous[$j + 1] + 1,
+                    $current[$j] + 1,
+                    $previous[$j] + $cost
+                );
+            }
+            $previous = $current;
+        }
+
+        return (int) end($previous);
+    }
+
+    private function leaveRecordTemplateStaffOrder(): array
+    {
+        static $order = null;
+
+        if ($order !== null) {
+            return $order;
+        }
+
+        return $order = cache()->remember('leave_record_template_staff_order', 3600, function () {
+            $path = public_path('template/2026LeaveRecord.xlsx');
+
+            if (! file_exists($path)) {
+                return [];
+            }
+
+            try {
+                $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+                $reader->setReadDataOnly(true);
+                $template = $reader->load($path);
+            } catch (\Throwable $e) {
+                return [];
+            }
+
+            $mapping = [];
+            foreach ($template->getSheetNames() as $sheetName) {
+                $sheet = $template->getSheetByName($sheetName);
+                $names = [];
+                for ($row = 5; $row <= $sheet->getHighestRow(); $row++) {
+                    $value = $sheet->getCell('B'.$row)->getValue();
+                    if ($value !== null && trim((string) $value) !== '') {
+                        $names[] = $this->normalizeLeaveRecordName($value);
+                    }
+                }
+                if ($names !== []) {
+                    $mapping[$sheetName] = $names;
+                }
+            }
+
+            return $mapping;
+        });
+    }
+
+    private function normalizeLeaveRecordName(?string $name): string
+    {
+        $name = preg_replace('/[\x{200C}\x{200D}\x{00AD}\x{FEFF}\s]+/u', '', (string) $name);
+
+        return \Normalizer::normalize($name, \Normalizer::FORM_KC) ?: $name;
+    }
+
+    private function leaveRecordBookTitle(int $year): string
+    {
+        return sprintf(
+            'ကွန်ပျူတာတက္ကသိုလ်( ဟင်္သာတ) %s ခုနှစ်၊  ဌာနအလိုက် ၀န်ထမ်းများခွင့်ယူမှတ်တမ်း',
+            $this->myanmarNumerals($year)
+        );
+    }
+
+    private function leaveRecordSheetName(string $name): string
+    {
+        $clean = trim(preg_replace('/[\[\]\*\:?\/\\\\]/u', '', $name) ?? '');
+
+        return mb_substr($clean !== '' ? $clean : 'Sheet', 0, 31);
+    }
+
+    private function myanmarNumerals(int|string $number): string
+    {
+        return str_replace(
+            ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
+            ['၀', '၁', '၂', '၃', '၄', '၅', '၆', '၇', '၈', '၉'],
+            (string) $number
+        );
+    }
+
+    private function writeLeaveRecordBookSheet(Worksheet $sheet, Department $department, int $year, string $title): void
+    {
+        $deptName = $department->name_mm ?? $department->name;
+        $sheet->setTitle($this->leaveRecordSheetName($deptName));
+
+        $sheet->setCellValue('A1', $title);
+        $sheet->mergeCells('A1:N1');
+
+        $sheet->setCellValue('A2', $deptName);
+        $sheet->mergeCells('A2:E2');
+
+        foreach (['A' => 'စဉ်', 'B' => 'အမည်', 'C' => 'ရာထူး', 'D' => 'ခွင့်အမျိုးအစား'] as $column => $label) {
+            $sheet->setCellValue($column.'3', $label);
+            $sheet->mergeCells($column.'3:'.$column.'4');
+        }
+        $sheet->setCellValue('E3', 'ခွင့်ယူသည့်ရက်စွဲ');
+        $sheet->mergeCells('E3:N3');
+
+        foreach (range(1, 10) as $i) {
+            $sheet->setCellValue(chr(64 + 4 + $i).'4', $i);
+        }
+
+        $sheet->getRowDimension(1)->setRowHeight(30);
+        $sheet->getRowDimension(2)->setRowHeight(30);
+        $sheet->getRowDimension(3)->setRowHeight(36);
+        $sheet->getRowDimension(4)->setRowHeight(29.25);
+
+        $staff = $this->leaveRecordBookStaff($department, $year);
+        $row = 5;
+
+        foreach ($staff as $index => $entry) {
+            $start = $row;
+            $end = $row + 5;
+
+            $sheet->setCellValue('A'.$start, $index + 1);
+            $sheet->setCellValue('B'.$start, $entry['user']->name_mm ?? $entry['user']->name);
+            $sheet->setCellValue('C'.$start, $entry['user']->position_mm ?? $entry['user']->position ?? '');
+
+            $sheet->mergeCells('A'.$start.':A'.$end);
+            $sheet->mergeCells('B'.$start.':B'.$end);
+            $sheet->mergeCells('C'.$start.':C'.$end);
+
+            foreach ($entry['rows'] as $rowIndex => $templateRow) {
+                $sheet->setCellValue('D'.($start + $rowIndex), $templateRow['mm']);
+
+                foreach ($templateRow['dates'] as $columnOffset => $date) {
+                    $sheet->setCellValue(chr(64 + 5 + $columnOffset).($start + $rowIndex), $date);
+                }
+            }
+
+            foreach (range($start, $end) as $currentRow) {
+                $sheet->getRowDimension($currentRow)->setRowHeight(24);
+            }
+
+            $row = $end + 1;
+        }
+
+        $lastRow = max(4, $row - 1);
+
+        $sheet->getStyle('A1:N'.$lastRow)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A1:N'.$lastRow)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        $sheet->getStyle('A1:N'.$lastRow)->getFont()->setName('Myanmar Text')->setSize(11);
+        $sheet->getStyle('A1:N1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A2:N2')->getFont()->setBold(true)->setSize(12);
+        $sheet->getStyle('A3:N4')->getFont()->setBold(true);
+        $sheet->getStyle('A1:N1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A2:N2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A3:N4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        foreach ($staff as $index => $entry) {
+            $start = 5 + $index * 6;
+            $end = $start + 5;
+            $sheet->getStyle('A'.$start.':A'.$end)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('C'.$start.':C'.$end)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('D'.$start.':D'.$end)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        }
+
+        foreach (['A' => 4.89, 'B' => 19.22, 'C' => 17.66, 'D' => 27.33, 'O' => 9.11] as $column => $width) {
+            $sheet->getColumnDimension($column)->setWidth($width);
+        }
+        foreach (range(5, 14) as $columnIndex) {
+            $sheet->getColumnDimensionByColumn($columnIndex)->setWidth(11.5);
+        }
+    }
+
+    private function leaveRecordYears(): array
+    {
+        $years = LeaveRequest::query()
+            ->whereNotNull('start_date')
+            ->selectRaw('YEAR(start_date) as year')
+            ->distinct()
+            ->pluck('year')
+            ->map(fn ($year) => (int) $year)
+            ->all();
+
+        $years[] = (int) now()->year;
+        $years = array_unique($years);
+        sort($years);
+
+        return $years;
     }
 
     public function getDailyReportData(Request $request)
@@ -834,8 +1329,8 @@ class DashboardController extends Controller
         $year = $filters['year'] ?? (int) now()->year;
 
         $staffQuery = User::where(function ($q) {
-                $q->where('role', 'staff')->orWhere('role', 'department_head');
-            })
+            $q->where('role', 'staff')->orWhere('role', 'department_head');
+        })
             ->with('department');
 
         if (! empty($filters['department_id'])) {
