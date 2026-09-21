@@ -73,13 +73,11 @@ class UserController extends Controller
         $departments = Department::get();
         $positions = Config::get('positions', []);
 
-        $nameSuggestions = User::where('role', '!=', 'super_admin')
-            ->get(['name', 'name_mm'])
-            ->flatMap(fn ($user) => array_values(array_filter([$user->name, $user->name_mm])))
-            ->unique()
-            ->values();
+        if ($request->ajax()) {
+            return view('admin.users.results', compact('users', 'sort', 'direction'));
+        }
 
-        return view('admin.users.index', compact('users', 'sort', 'direction', 'departments', 'positions', 'nameSuggestions'));
+        return view('admin.users.index', compact('users', 'sort', 'direction', 'departments', 'positions'));
     }
 
     public function create()

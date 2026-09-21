@@ -84,45 +84,38 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
-document.querySelectorAll('form[data-confirm]').forEach(function(form) {
-    function onSubmit(e) {
-        e.preventDefault();
-        const message = form.getAttribute('data-confirm') || __('common.confirm');
-        const confirmText = form.getAttribute('data-confirm-text') || '';
-        showConfirmModal(message, confirmText).then(function(confirmed) {
-            if (confirmed) {
-                form.removeEventListener('submit', onSubmit);
+document.addEventListener('click', function(event) {
+    const el = event.target.closest('a[data-confirm], button[data-confirm]');
+    if (!el) return;
+    const message = el.getAttribute('data-confirm');
+    if (!message) return;
+    event.preventDefault();
+    const href = el.getAttribute('href');
+    const form = el.closest('form') || document.getElementById(el.getAttribute('form') || '');
+    const confirmText = el.getAttribute('data-confirm-text') || '';
+    showConfirmModal(message, confirmText).then(function(confirmed) {
+        if (confirmed) {
+            if (form) {
                 form.submit();
+            } else if (href) {
+                window.location.href = href;
             }
-        });
-    }
-    form._confirmHandler = onSubmit;
-    form.addEventListener('submit', onSubmit);
+        }
+    });
 });
 
-document.querySelectorAll('a[data-confirm], button[data-confirm]').forEach(function(el) {
-    function onClick(e) {
-        const message = el.getAttribute('data-confirm');
-        if (!message) return;
-        e.preventDefault();
-        const href = el.getAttribute('href');
-        const form = el.closest('form') || document.getElementById(el.getAttribute('form') || '');
-        const confirmText = el.getAttribute('data-confirm-text') || '';
-        showConfirmModal(message, confirmText).then(function(confirmed) {
-            if (confirmed) {
-                if (form && form._confirmHandler) {
-                    form.removeEventListener('submit', form._confirmHandler);
-                }
-                if (form) {
-                    form.submit();
-                } else if (href) {
-                    window.location.href = href;
-                }
-            }
-        });
-    }
-    el._confirmClickHandler = onClick;
-    el.addEventListener('click', onClick);
+document.addEventListener('submit', function(event) {
+    const form = event.target;
+    if (!form.matches || !form.matches('form[data-confirm]')) return;
+    const message = form.getAttribute('data-confirm');
+    if (!message) return;
+    event.preventDefault();
+    const confirmText = form.getAttribute('data-confirm-text') || '';
+    showConfirmModal(message, confirmText).then(function(confirmed) {
+        if (confirmed) {
+            form.submit();
+        }
+    });
 });
 
 let notificationDropdownOpen = false;

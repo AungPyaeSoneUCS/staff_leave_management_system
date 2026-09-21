@@ -650,7 +650,15 @@
     "admin.import_leave_columns_hint": "လက်ခံနိုင်သော ကော်လံများ: staff_id, leave_type (ကုဒ်), start_date, end_date, total_days, is_half_day (yes/no), status (approved/rejected/pending/...), duty_exchange (အစားဝင်မည့်သူ၏ staff_id)။",
     "admin.import": "တင်သွင်းရန်",
     "flash.leave_import_completed": "ခွင့်မှတ်တမ်းဟောင်းများ တင်သွင်းခြင်း ပြီးဆုံးပါပြီ။ :imported မှတ်တမ်း တင်သွင်းပြီးပါပြီ၊ :skipped မှတ်တမ်း ကျော်လိုက်ပါပြီ။",
+    "flash.custom_import_completed": "ကိုယ်တိုင်ထည့်သွင်းခြင်း ပြီးဆုံးပါပြီ။ :imported မှတ်တမ်း ထည့်သွင်းပြီးပါပြီ။",
+    "flash.custom_import_completed_with_skipped": "ကိုယ်တိုင်ထည့်သွင်းခြင်း ပြီးဆုံးပါပြီ။ :imported မှတ်တမ်း ထည့်သွင်းပြီး :skipped အတန်း ကျော်လိုက်ပါပြီ။",
+    "flash.custom_import_no_valid_rows": "တင်သွင်းရန် အတန်းများ မတွေ့ပါ။ :skipped အတန်း(များ) ရက်အတွင်း အလုပ်လုပ်ရက် မရှိခြင်း သို့မဟုတ် ဝန်ထမ်း/ခွင့်အမျိုးအစား မကိုက်ညီသောကြောင့် ကျော်လိုက်ပါသည်။",
     "common.required_columns": "လိုအပ်သော ကော်လံများ:",
     "admin.leave_import_no_valid_rows": "တင်သွင်းရန် တရားဝင် အတန်းများ မတွေ့ပါ။ :skipped အတန်း(များ) ကို staff_id၊ leave_type သို့မဟုတ် start_date မကိုက်ညီသောကြောင့် ကျော်လိုက်ပါသည်။ staff_id သည် ရှိပြီးသား ဝန်ထမ်းနှင့် ကိုက်ညီကြောင်း၊ leave_type သည် မှန်ကန်သော ကုဒ် (ဥပမာ ANNUAL) ဖြစ်ကြောင်း၊ start_date သည် မှန်ကန်သော ရက်စွဲဖြစ်ကြောင်း စစ်ဆေးပါ။",
-    "admin.leave_import_skipped_hint": ":skipped အတန်း(များ) ကို staff_id၊ leave_type သို့မဟုတ် start_date စနစ်နှင့် မကိုက်ညီသောကြောင့် ကျော်လိုက်ပါသည်။"
+    "admin.leave_import_skipped_hint": ":skipped အတန်း(များ) ကို staff_id၊ leave_type သို့မဟုတ် start_date စနစ်နှင့် မကိုက်ညီသောကြောင့် ကျော်လိုက်ပါသည်။",
+    "admin.custom_import": "ကိုယ်တိုင်ထည့်သွင်းခြင်း",
+    "admin.custom_import_hint": "ခွင့်မှတ်တမ်းများ တစ်ခုချင်းစီ ထည့်သွင်းရန်။ ဝန်ထမ်းအမည် သို့မဟုတ် အိုင်ဒီဖြင့် ရွေးပါ၊ စတင်သည့်ရက်သည် ယနေ့ဖြစ်ပြီး စုစုပေါင်းရက်ကို အလိုအလျောက်တွက်ပေးသည် (တစ်ဝက် = 0.5)၊ အခြေအနေမှာ အတည်ပြုပြီး (Approved) ဖြစ်သည်။",
+    "admin.add_staff": "ဝန်ထမ်းထည့်ရန်",
+    "admin.staff_name_or_id": "အမည် သို့မဟုတ် အိုင်ဒီ",
+    "admin.custom_import_staff_required": "အတန်းတိုင်းအတွက် ဝန်ထမ်းကို ရွေးချယ်ပြီးမှ သိမ်းပါ။"
 }

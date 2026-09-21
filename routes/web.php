@@ -208,6 +208,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/leave-import', [LeaveImportController::class, 'importPreview'])->name('leave-import.preview');
         Route::post('/leave-import/process', [LeaveImportController::class, 'importProcess'])->name('leave-import.process');
         Route::get('/leave-import/template', [LeaveImportController::class, 'importTemplate'])->name('leave-import.template');
+        Route::post('/leave-import/custom', [LeaveImportController::class, 'customStore'])->name('leave-import.custom');
+        Route::get('/leave-import/calculate-total-days', [LeaveImportController::class, 'calculateTotalDaysApi'])->name('leave-import.calculate-total-days');
         Route::get('/leave-records', [AdminDashboardController::class, 'leaveRecords'])->name('leave-records');
         Route::get('/leave-records/export', [AdminDashboardController::class, 'exportLeaveRecords'])->name('leave-records.export');
         Route::get('/leave-records/order', [AdminDashboardController::class, 'leaveRecordOrder'])->name('leave-records.order');

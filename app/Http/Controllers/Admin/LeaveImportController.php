@@ -7,6 +7,7 @@ use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use App\Models\User;
 use App\Services\LeaveBalanceService;
+use App\Services\LeaveWorkflowService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -14,7 +15,114 @@ class LeaveImportController extends Controller
 {
     public function index()
     {
-        return view('admin.leave-import.index');
+        $staff = User::whereIn('role', ['staff', 'department_head', 'admin'])
+            ->orderBy('name')
+            ->get(['id', 'name', 'name_mm', 'staff_id', 'email']);
+
+        $leaveTypes = LeaveType::where('is_active', true)->orderBy('name')->get();
+
+        $today = Carbon::now()->format('Y-m-d');
+
+        return view('admin.leave-import.index', compact('staff', 'leaveTypes', 'today'));
+    }
+
+    public function customStore(Request $request)
+    {
+        $validated = $request->validate([
+            'rows' => ['required', 'array', 'min:1'],
+            'rows.*.user_id' => ['required', 'integer', 'exists:users,id'],
+            'rows.*.leave_type_id' => ['required', 'integer', 'exists:leave_types,id'],
+            'rows.*.start_date' => ['required', 'date'],
+            'rows.*.end_date' => ['nullable', 'date'],
+            'rows.*.is_half_day' => ['nullable', 'boolean'],
+        ]);
+
+        $balanceService = app(LeaveBalanceService::class);
+        $imported = 0;
+        $skipped = 0;
+
+        foreach ($validated['rows'] as $row) {
+            $user = User::find($row['user_id']);
+            $leaveType = LeaveType::find($row['leave_type_id']);
+
+            if (! $user || ! $leaveType) {
+                $skipped++;
+
+                continue;
+            }
+
+            $startDate = Carbon::parse($row['start_date'])->format('Y-m-d');
+            $isHalfDay = ! empty($row['is_half_day']);
+            $endDate = $isHalfDay || ($row['end_date'] ?? '') === ''
+                ? $startDate
+                : Carbon::parse($row['end_date'])->format('Y-m-d');
+
+            if (Carbon::parse($endDate)->lt(Carbon::parse($startDate))) {
+                $skipped++;
+
+                continue;
+            }
+
+            $totalDays = $this->calculateTotalDays($startDate, $endDate, $isHalfDay);
+            if ($totalDays <= 0) {
+                $skipped++;
+
+                continue;
+            }
+
+            LeaveRequest::create([
+                'user_id' => $user->id,
+                'leave_type_id' => $leaveType->id,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'total_days' => $totalDays,
+                'reason' => 'Manual import',
+                'status' => 'approved',
+                'current_approval_level' => 2,
+                'is_half_day' => $isHalfDay,
+            ]);
+
+            $balanceService->updateUsedDays($user, $leaveType, (float) $totalDays);
+
+            $imported++;
+        }
+
+        if ($imported === 0) {
+            return back()->withInput()->with('error', __('flash.custom_import_no_valid_rows', ['skipped' => $skipped]));
+        }
+
+        $message = $skipped > 0
+            ? __('flash.custom_import_completed_with_skipped', ['imported' => $imported, 'skipped' => $skipped])
+            : __('flash.custom_import_completed', ['imported' => $imported]);
+
+        return redirect()->route('admin.leave-import.index')->with('success', $message);
+    }
+
+    public function calculateTotalDaysApi(Request $request)
+    {
+        $validated = $request->validate([
+            'start_date' => ['required', 'date'],
+            'end_date' => ['nullable', 'date'],
+            'is_half_day' => ['nullable', 'boolean'],
+        ]);
+
+        $startDate = Carbon::parse($validated['start_date'])->format('Y-m-d');
+        $isHalfDay = ! empty($validated['is_half_day']);
+        $endDate = $isHalfDay || ($validated['end_date'] ?? '') === ''
+            ? $startDate
+            : Carbon::parse($validated['end_date'])->format('Y-m-d');
+
+        if (Carbon::parse($endDate)->lt(Carbon::parse($startDate))) {
+            return response()->json(['message' => __('staff.end_date_after_start')], 422);
+        }
+
+        $totalDays = $this->calculateTotalDays($startDate, $endDate, $isHalfDay);
+
+        return response()->json([
+            'total_days' => $totalDays,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+        ]);
     }
 
     public function importPreview(Request $request)
@@ -297,7 +405,7 @@ class LeaveImportController extends Controller
 
     private function calculateTotalDays(string $startDate, string $endDate, bool $halfDay): float
     {
-        $workflow = app(\App\Services\LeaveWorkflowService::class);
+        $workflow = app(LeaveWorkflowService::class);
 
         return (float) $workflow->calculateTotalDays($startDate, $endDate, $halfDay);
     }
@@ -422,7 +530,7 @@ class LeaveImportController extends Controller
         $days = floor($serial);
         $seconds = (int) round(($serial - $days) * 86400);
 
-        $epoch = \Illuminate\Support\Carbon::create(1899, 12, 30, 0, 0, 0);
+        $epoch = Carbon::create(1899, 12, 30, 0, 0, 0);
 
         return $epoch->copy()->addDays($days)->addSeconds($seconds)->format('Y-m-d');
     }

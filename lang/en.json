@@ -655,7 +655,15 @@
     "admin.import_leave_columns_hint": "Accepted columns: staff_id, leave_type (code), start_date, end_date, total_days, is_half_day (yes/no), status (approved/rejected/pending/...), duty_exchange (staff_id of the covering person).",
     "admin.import": "Import",
     "flash.leave_import_completed": "Leave import completed. :imported records imported, :skipped records skipped.",
+    "flash.custom_import_completed": "Manual import completed. :imported record(s) added.",
+    "flash.custom_import_completed_with_skipped": "Manual import completed. :imported record(s) added, :skipped row(s) skipped.",
+    "flash.custom_import_no_valid_rows": "No valid rows to import. :skipped row(s) were skipped there is no working day in the given range or the staff/leave type could not be matched.",
     "common.required_columns": "Required columns:",
     "admin.leave_import_no_valid_rows": "No valid rows found to import. :skipped row(s) were skipped because the staff_id, leave_type, or start_date did not match. Check that staff_id matches an existing staff member, leave_type is a valid code (e.g. ANNUAL), and start_date is a valid date.",
-    "admin.leave_import_skipped_hint": ":skipped row(s) were skipped because staff_id, leave_type, or start_date did not match the system records."
+    "admin.leave_import_skipped_hint": ":skipped row(s) were skipped because staff_id, leave_type, or start_date did not match the system records.",
+    "admin.custom_import": "Custom Import",
+    "admin.custom_import_hint": "Add leave records one by one. Pick a staff by name or staff ID, start date defaults to today, total days are calculated automatically (half day = 0.5), and the status is set to Approved.",
+    "admin.add_staff": "Add Staff",
+    "admin.staff_name_or_id": "Name or Staff ID",
+    "admin.custom_import_staff_required": "Pick a staff member from the dropdown for each row before saving."
 }
