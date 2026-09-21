@@ -184,9 +184,16 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function leaveRecordOrder()
+    public function leaveRecordOrder(Request $request)
     {
+        $validated = $request->validate([
+            'department_id' => ['nullable', 'exists:departments,id'],
+        ]);
+
+        $departmentId = $validated['department_id'] ?? null;
+
         $departments = Department::query()
+            ->when($departmentId, fn ($query) => $query->whereKey($departmentId))
             ->orderBy('id')
             ->get()
             ->map(fn (Department $department) => [
@@ -194,7 +201,9 @@ class DashboardController extends Controller
                 'staff' => $this->leaveRecordOrderedStaff($department),
             ]);
 
-        return view('admin.leave-records.order', compact('departments'));
+        $departmentList = Department::orderBy('id')->get();
+
+        return view('admin.leave-records.order', compact('departments', 'departmentList', 'departmentId'));
     }
 
     public function saveLeaveRecordOrder(Request $request)
@@ -235,7 +244,14 @@ class DashboardController extends Controller
             }
         }
 
-        return redirect()->route('admin.leave-records.order')->with('status', __('admin.leave_records_order_saved'));
+        $redirect = ['department_id' => $request->input('department_id')];
+        if ($redirect['department_id'] === null) {
+            $redirect = [];
+        }
+
+        return redirect()
+            ->route('admin.leave-records.order', $redirect)
+            ->with('status', __('admin.leave_records_order_saved'));
     }
 
     private function leaveRecordTemplateRows(): array
@@ -293,6 +309,7 @@ class DashboardController extends Controller
     {
         $staff = User::query()
             ->where('department_id', $department->id)
+            ->where('role', '!=', 'admin')
             ->get()
             ->map(fn (User $user) => [
                 'user' => $user,

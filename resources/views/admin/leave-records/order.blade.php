@@ -18,7 +18,22 @@
             <div class="cu-alert-success" role="status">{{ session('status') }}</div>
         @endif
 
-        <form method="POST" action="{{ route('admin.leave-records.order.save') }}" id="staff-order-form">
+        <div class="cu-card cu-card-body">
+            <form method="GET" action="{{ route('admin.leave-records.order') }}"
+                class="flex flex-nowrap items-end gap-3 overflow-x-auto pb-2">
+                <select name="department_id" id="staff-order-department" class="cu-select w-auto min-w-[220px]"
+                    onchange="this.form.submit()">
+                    <option value="">{{ __('admin.all_departments') }}</option>
+                    @foreach($departmentList as $department)
+                        <option value="{{ $department->id }}" {{ (int) $department->id === (int) $departmentId ? 'selected' : '' }}>
+                            {{ app()->getLocale() == 'my' ? $department->name_mm ?? $department->name : $department->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </form>
+        </div>
+
+        <form method="POST" action="{{ route('admin.leave-records.order.save', ['department_id' => $departmentId]) }}" id="staff-order-form">
             @csrf
 
             <div class="space-y-6">
