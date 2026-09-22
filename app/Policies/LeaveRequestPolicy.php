@@ -75,7 +75,6 @@ class LeaveRequestPolicy
         if ($user->isDepartmentHead()) {
             return $leaveRequest->user->department_id === $user->department_id
                 && $leaveRequest->user->role === 'staff'
-                && ! $leaveRequest->user->require_admin_approval
                 && $leaveRequest->current_approval_level === 1;
         }
 

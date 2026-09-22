@@ -650,6 +650,10 @@
     "admin.custom_staff_order": "Custom Staff Order",
     "admin.custom_staff_order_subtitle": "Reorder staff within each department. Saved order is used by the Leave Records page and export.",
     "admin.leave_records_order_saved": "Staff order saved.",
+    "admin.sort_departments": "Sort Departments",
+    "admin.department_order_title": "Department Order",
+    "admin.department_order_subtitle": "Set the display order for departments. It is used in every department dropdown and across all reports and leave record pages.",
+    "admin.department_order_saved": "Department order saved.",
     "admin.import_leave": "Import Leave Data",
     "admin.import_leave_subtitle": "Import staff leave history records from an Excel or CSV file.",
     "admin.import_leave_columns_hint": "Accepted columns: staff_id, leave_type (code), start_date, end_date, total_days, is_half_day (yes/no), status (approved/rejected/pending/...), duty_exchange (staff_id of the covering person).",
@@ -665,5 +669,16 @@
     "admin.custom_import_hint": "Add leave records one by one. Pick a staff by name or staff ID, start date defaults to today, total days are calculated automatically (half day = 0.5), and the status is set to Approved.",
     "admin.add_staff": "Add Staff",
     "admin.staff_name_or_id": "Name or Staff ID",
-    "admin.custom_import_staff_required": "Pick a staff member from the dropdown for each row before saving."
+    "admin.custom_import_staff_required": "Pick a staff member from the dropdown for each row before saving.",
+    "admin.add_day": "Add Leave Day",
+    "admin.edit_day": "Edit Leave Day",
+    "admin.leave_day_start": "Start date",
+    "admin.leave_day_end": "End date",
+    "admin.leave_day_half": "Half day",
+    "admin.leave_day_delete_confirm": "Delete this leave day entry?",
+    "flash.leave_record_day_added": "Leave day added.",
+    "flash.leave_record_day_updated": "Leave day updated.",
+    "flash.leave_record_day_deleted": "Leave day deleted.",
+    "flash.leave_record_day_invalid": "Invalid dates. The leave day could not be saved.",
+    "flash.leave_record_day_reason": "Manual leave record"
 }

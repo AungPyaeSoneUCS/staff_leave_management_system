@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\HolidayController;
 use App\Http\Controllers\Admin\LeaveImportController;
+use App\Http\Controllers\Admin\LeaveRecordDayController;
 use App\Http\Controllers\Admin\LeaveTypeController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\StaffController as AdminStaffController;
@@ -193,6 +194,8 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('admin')->name('admin.')->middleware('role:admin,super_admin')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/departments/order', [DepartmentController::class, 'order'])->name('departments.order');
+        Route::post('/departments/order', [DepartmentController::class, 'saveOrder'])->name('departments.order.save');
         Route::resource('departments', DepartmentController::class);
         Route::get('/users/import', function () {
             return redirect()->route('admin.users.index');
@@ -214,6 +217,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/leave-records/export', [AdminDashboardController::class, 'exportLeaveRecords'])->name('leave-records.export');
         Route::get('/leave-records/order', [AdminDashboardController::class, 'leaveRecordOrder'])->name('leave-records.order');
         Route::post('/leave-records/order', [AdminDashboardController::class, 'saveLeaveRecordOrder'])->name('leave-records.order.save');
+
+        Route::post('/leave-records/day', [LeaveRecordDayController::class, 'store'])->name('leave-records.day.store');
+
+        Route::put('/leave-records/day/{leaveRequest}', [LeaveRecordDayController::class, 'update'])->name('leave-records.day.update');
+
+        Route::delete('/leave-records/day/{leaveRequest}', [LeaveRecordDayController::class, 'destroy'])->name('leave-records.day.destroy');
         Route::get('/holidays', [HolidayController::class, 'index'])->name('holidays.index');
         Route::get('/holidays/calendar', [HolidayController::class, 'calendar'])->name('holidays.calendar');
         Route::post('/holidays', [HolidayController::class, 'store'])->name('holidays.store');

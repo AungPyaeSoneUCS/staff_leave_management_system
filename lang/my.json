@@ -645,6 +645,10 @@
     "admin.custom_staff_order": "ဝန်ထမ်းအစဉ်ပြင်ဆင်ရန်",
     "admin.custom_staff_order_subtitle": "ဌာနတစ်ခုစီတွင် ဝန်ထမ်းများ၏အစဉ် ပြင်ဆင်ရန်။ သိမ်းထားသောအစဉ်ကို ခွင့်မှတ်တမ်းစာမျက်နှာနှင့် ထုတ်ယူမှုတွင် အသုံးပြုသည်။",
     "admin.leave_records_order_saved": "ဝန်ထမ်းအစဉ် သိမ်းပြီးပါပြီ။",
+    "admin.sort_departments": "ဌာနအစဉ် စီရန်",
+    "admin.department_order_title": "ဌာန အစဉ်",
+    "admin.department_order_subtitle": "ဌာနအစဉ်ကို သတ်မှတ်ပါ။ dropdown အားလုံး၊ အစီရင်ခံစာများနှင့် ခွင့်မှတ်တမ်းစာမျက်နှာများတွင် အသုံးပြုသည်။",
+    "admin.department_order_saved": "ဌာနအစဉ် သိမ်းပြီးပါပြီ။",
     "admin.import_leave": "ခွင့်မှတ်တမ်းဟောင်းများတင်သွင်းခြင်း",
     "admin.import_leave_subtitle": "ဝန်ထမ်း ခွင့်မှတ်တမ်းဟောင်းများ အချက်အလက်များကို Excel သို့မဟုတ် CSV ဖိုင်မှ တင်သွင်းပါ။",
     "admin.import_leave_columns_hint": "လက်ခံနိုင်သော ကော်လံများ: staff_id, leave_type (ကုဒ်), start_date, end_date, total_days, is_half_day (yes/no), status (approved/rejected/pending/...), duty_exchange (အစားဝင်မည့်သူ၏ staff_id)။",
@@ -660,5 +664,16 @@
     "admin.custom_import_hint": "ခွင့်မှတ်တမ်းများ တစ်ခုချင်းစီ ထည့်သွင်းရန်။ ဝန်ထမ်းအမည် သို့မဟုတ် အိုင်ဒီဖြင့် ရွေးပါ၊ စတင်သည့်ရက်သည် ယနေ့ဖြစ်ပြီး စုစုပေါင်းရက်ကို အလိုအလျောက်တွက်ပေးသည် (တစ်ဝက် = 0.5)၊ အခြေအနေမှာ အတည်ပြုပြီး (Approved) ဖြစ်သည်။",
     "admin.add_staff": "ဝန်ထမ်းထည့်ရန်",
     "admin.staff_name_or_id": "အမည် သို့မဟုတ် အိုင်ဒီ",
-    "admin.custom_import_staff_required": "အတန်းတိုင်းအတွက် ဝန်ထမ်းကို ရွေးချယ်ပြီးမှ သိမ်းပါ။"
+    "admin.custom_import_staff_required": "အတန်းတိုင်းအတွက် ဝန်ထမ်းကို ရွေးချယ်ပြီးမှ သိမ်းပါ။",
+    "admin.add_day": "ခွင့်နေ့ ထည့်ရန်",
+    "admin.edit_day": "ခွင့်နေ့ ပြင်ဆင်ရန်",
+    "admin.leave_day_start": "စတင်သည့်နေ့",
+    "admin.leave_day_end": "ပြီးဆုံးသည့်နေ့",
+    "admin.leave_day_half": "တစ်ဝက်နေ့",
+    "admin.leave_day_delete_confirm": "ဤခွင့်နေ့ကို ဖျက်မည်လား။",
+    "flash.leave_record_day_added": "ခွင့်နေ့ ထည့်သွင်းပြီးပါပြီ။",
+    "flash.leave_record_day_updated": "ခွင့်နေ့ ပြင်ဆင်ပြီးပါပြီ။",
+    "flash.leave_record_day_deleted": "ခွင့်နေ့ ဖျက်ပြီးပါပြီ။",
+    "flash.leave_record_day_invalid": "ရက်စွဲမမှန်ကန်ပါ။ ခွင့်နေ့ကို သိမ်း၍မရပါ။",
+    "flash.leave_record_day_reason": "လက်ဖြင့် ခွင့်မှတ်တမ်း"
 }

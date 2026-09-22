@@ -30,8 +30,7 @@ class ApprovalController extends Controller
                     ->orWhere('duty_exchange_status', 'accepted');
             })
             ->whereHas('user', function ($query) use ($departmentId) {
-                $query->where('department_id', $departmentId)
-                    ->where('require_admin_approval', false);
+                $query->where('department_id', $departmentId);
             })
             ->with('user', 'leaveType', 'dutyExchangeUser');
 

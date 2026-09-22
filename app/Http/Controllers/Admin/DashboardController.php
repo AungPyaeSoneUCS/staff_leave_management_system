@@ -85,7 +85,7 @@ class DashboardController extends Controller
 
     public function balanceReport()
     {
-        $departments = Department::get();
+        $departments = Department::ordered()->get();
         $leaveTypes = LeaveType::where('is_active', true)->get();
         $currentYear = now()->year;
 
@@ -94,7 +94,7 @@ class DashboardController extends Controller
 
     public function leaveSummaryReport()
     {
-        $departments = Department::get();
+        $departments = Department::ordered()->get();
         $leaveTypes = LeaveType::where('is_active', true)->get();
         $currentYear = now()->year;
 
@@ -103,7 +103,7 @@ class DashboardController extends Controller
 
     public function leaveTypeReport()
     {
-        $departments = Department::get();
+        $departments = Department::ordered()->get();
         $leaveTypes = LeaveType::where('is_active', true)->get();
         $currentYear = now()->year;
 
@@ -112,7 +112,7 @@ class DashboardController extends Controller
 
     public function departmentReport()
     {
-        $departments = Department::get();
+        $departments = Department::ordered()->get();
         $leaveTypes = LeaveType::where('is_active', true)->get();
         $currentYear = now()->year;
 
@@ -136,7 +136,7 @@ class DashboardController extends Controller
 
         $departments = Department::query()
             ->when($departmentId, fn ($query) => $query->whereKey($departmentId))
-            ->orderBy('id')
+            ->ordered()
             ->get();
 
         $books = $departments->map(fn (Department $department) => [
@@ -144,11 +144,13 @@ class DashboardController extends Controller
             'staff' => $this->leaveRecordBookStaff($department, $year),
         ]);
 
+        $departmentList = Department::ordered()->get();
+
         $years = $this->leaveRecordYears();
 
         $bookTitle = $this->leaveRecordBookTitle($year);
 
-        return view('admin.leave-records.index', compact('books', 'years', 'year', 'departmentId', 'bookTitle'));
+        return view('admin.leave-records.index', compact('books', 'years', 'year', 'departmentId', 'bookTitle', 'departmentList'));
     }
 
     public function exportLeaveRecords(Request $request)
@@ -163,7 +165,7 @@ class DashboardController extends Controller
 
         $departments = Department::query()
             ->when($departmentId, fn ($query) => $query->whereKey($departmentId))
-            ->orderBy('id')
+            ->ordered()
             ->get();
 
         $spreadsheet = new Spreadsheet;
@@ -201,7 +203,7 @@ class DashboardController extends Controller
                 'staff' => $this->leaveRecordOrderedStaff($department),
             ]);
 
-        $departmentList = Department::orderBy('id')->get();
+        $departmentList = Department::ordered()->get();
 
         return view('admin.leave-records.order', compact('departments', 'departmentList', 'departmentId'));
     }
@@ -294,7 +296,7 @@ class DashboardController extends Controller
                             ->where('leave_type_id', $row['type']->id)
                             ->filter(fn (LeaveRequest $record) => $record->start_date !== null)
                             ->take(10)
-                            ->map(fn (LeaveRequest $record) => $record->start_date->format('d/m/Y'))
+                            ->map(fn (LeaveRequest $record) => $this->leaveRecordDayCell($record))
                             ->values()
                             ->all()
                         : [];
@@ -303,6 +305,22 @@ class DashboardController extends Controller
                 }, $this->leaveRecordTemplateRows()),
             ];
         });
+    }
+
+    private function leaveRecordDayCell(LeaveRequest $record): array
+    {
+        $sameDay = $record->end_date === null
+            || $record->end_date->toDateString() === $record->start_date->toDateString();
+
+        return [
+            'id' => $record->id,
+            'start' => $record->start_date->format('d/m/Y'),
+            'end' => $record->end_date?->format('d/m/Y'),
+            'half' => (bool) $record->is_half_day,
+            'label' => $sameDay
+                ? $record->start_date->format('d/m/Y')
+                : $record->start_date->format('d/m/Y').' - '.$record->end_date->format('d/m/Y'),
+        ];
     }
 
     private function leaveRecordDefaultStaffOrder(Department $department): \Illuminate\Support\Collection
@@ -569,7 +587,7 @@ class DashboardController extends Controller
                 $sheet->setCellValue('D'.($start + $rowIndex), $templateRow['mm']);
 
                 foreach ($templateRow['dates'] as $columnOffset => $date) {
-                    $sheet->setCellValue(chr(64 + 5 + $columnOffset).($start + $rowIndex), $date);
+                    $sheet->setCellValue(chr(64 + 5 + $columnOffset).($start + $rowIndex), $date['label']);
                 }
             }
 
@@ -1279,7 +1297,7 @@ class DashboardController extends Controller
             ->orderByDesc($dateFilter)
             ->get();
 
-        $allDepartments = Department::get()->mapWithKeys(function ($dept) {
+        $allDepartments = Department::ordered()->get()->mapWithKeys(function ($dept) {
             $localizedName = $this->localizedName($dept->name, $dept->name_mm);
 
             return [$dept->id => [

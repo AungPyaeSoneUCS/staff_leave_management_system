@@ -23,7 +23,7 @@ class AdminManagementController extends Controller
 
     public function create()
     {
-        $departments = Department::get();
+        $departments = Department::ordered()->get();
         $positions = config('positions', []);
 
         return view('super-admin.admins.create', compact('departments', 'positions'));
@@ -68,7 +68,7 @@ class AdminManagementController extends Controller
             abort(404);
         }
 
-        $departments = Department::get();
+        $departments = Department::ordered()->get();
         $positions = config('positions', []);
 
         return view('super-admin.admins.edit', compact('user', 'departments', 'positions'));

@@ -166,8 +166,8 @@ class AnalyticsService
         $year = $filters['year'] ?? (int) now()->year;
 
         $staffQuery = User::where(function ($q) {
-                $q->where('role', 'staff')->orWhere('role', 'department_head');
-            })
+            $q->where('role', 'staff')->orWhere('role', 'department_head');
+        })
             ->with('department');
 
         if (! empty($filters['department_id'])) {
@@ -228,6 +228,7 @@ class AnalyticsService
         $year = $filters['year'] ?? now()->year;
 
         $query = Department::query()
+            ->ordered()
             ->withCount(['users as staff_count' => function ($query) {
                 $query->where('is_active', true);
             }])

@@ -13,9 +13,32 @@ class DepartmentController extends Controller
     {
         $departments = Department::withCount('users')
             ->with('head')
+            ->ordered()
             ->paginate(10);
 
         return view('admin.departments.index', compact('departments'));
+    }
+
+    public function order()
+    {
+        $departments = Department::ordered()->get();
+
+        return view('admin.departments.order', compact('departments'));
+    }
+
+    public function saveOrder(Request $request)
+    {
+        $validated = $request->validate([
+            'dept_order' => ['required', 'array'],
+            'dept_order.*' => ['integer', 'exists:departments,id'],
+        ]);
+
+        foreach (array_values($validated['dept_order']) as $position => $departmentId) {
+            Department::whereKey($departmentId)->update(['sort_order' => $position + 1]);
+        }
+
+        return redirect()->route('admin.departments.order')
+            ->with('status', __('admin.department_order_saved'));
     }
 
     public function create()

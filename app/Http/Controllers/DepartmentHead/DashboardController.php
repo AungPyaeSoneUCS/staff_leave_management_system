@@ -38,8 +38,7 @@ class DashboardController extends Controller
 
         $pendingApprovals = LeaveRequest::where('status', 'pending')
             ->where('current_approval_level', 1)
-            ->whereHas('user', fn ($query) => $query->where('department_id', $departmentId)
-                ->where('require_admin_approval', false))
+            ->whereHas('user', fn ($query) => $query->where('department_id', $departmentId))
             ->count();
 
         $departmentStaff = User::where('department_id', $departmentId)

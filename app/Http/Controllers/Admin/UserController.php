@@ -70,7 +70,7 @@ class UserController extends Controller
 
         $users = $query->paginate(15)->withQueryString();
 
-        $departments = Department::get();
+        $departments = Department::ordered()->get();
         $positions = Config::get('positions', []);
 
         if ($request->ajax()) {
@@ -82,7 +82,7 @@ class UserController extends Controller
 
     public function create()
     {
-        $departments = Department::get();
+        $departments = Department::ordered()->get();
         $positions = Config::get('positions', []);
 
         return view('admin.users.create', compact('departments', 'positions'));
@@ -129,7 +129,7 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $departments = Department::get();
+        $departments = Department::ordered()->get();
         $positions = Config::get('positions', []);
 
         return view('admin.users.edit', compact('user', 'departments', 'positions'));
@@ -225,7 +225,7 @@ class UserController extends Controller
         $header = array_shift($rows);
 
         $positions = Config::get('positions', []);
-        $departments = Department::pluck('name', 'id')->toArray();
+        $departments = Department::ordered()->pluck('name', 'id')->toArray();
 
         $previewData = [];
         $hasConflicts = false;

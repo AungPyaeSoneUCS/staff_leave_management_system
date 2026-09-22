@@ -160,7 +160,7 @@ class LeaveRequestController extends Controller
             'reason' => $validated['reason'],
             'staff_signature' => $validated['signature'],
             'status' => 'pending',
-            'current_approval_level' => auth()->user()->isDepartmentHead() || auth()->user()->require_admin_approval ? 2 : 1,
+            'current_approval_level' => auth()->user()->isDepartmentHead() || auth()->user()->isAdmin() || auth()->user()->isSuperAdmin() ? 2 : 1,
             'duty_exchange_user_id' => $validated['duty_exchange_user_id'] ?? null,
             'duty_exchange_status' => ! empty($validated['duty_exchange_user_id']) ? 'pending' : null,
             'is_half_day' => $isHalfDay,
@@ -182,7 +182,7 @@ class LeaveRequestController extends Controller
             if ($exchangeUser) {
                 $exchangeUser->notify(new DutyExchangeRequestNotification($leaveRequest));
             }
-        } elseif (auth()->user()->isDepartmentHead() || auth()->user()->require_admin_approval) {
+        } elseif (auth()->user()->isDepartmentHead() || auth()->user()->isAdmin() || auth()->user()->isSuperAdmin()) {
             User::where('role', 'admin')
                 ->whereIn('id', AdminAssignment::select('admin_id'))
                 ->get()

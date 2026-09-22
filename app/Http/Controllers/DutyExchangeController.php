@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\AdminAssignment;
 use App\Models\LeaveRequest;
 use App\Models\User;
-use App\Notifications\DutyExchangeRequestNotification;
 use App\Notifications\LeaveRequestStatusUpdatedNotification;
 use App\Notifications\LeaveRequestSubmittedNotification;
 use Illuminate\Http\Request;
@@ -94,7 +93,7 @@ class DutyExchangeController extends Controller
     {
         $requester = $leaveRequest->user;
 
-        if ($requester->isDepartmentHead() || $requester->require_admin_approval) {
+        if ($requester->isDepartmentHead() || $requester->isAdmin() || $requester->isSuperAdmin()) {
             User::where('role', 'admin')
                 ->whereIn('id', AdminAssignment::select('admin_id'))
                 ->get()

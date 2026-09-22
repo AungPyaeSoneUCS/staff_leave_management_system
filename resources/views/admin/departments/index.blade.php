@@ -9,7 +9,10 @@
             <h2 class="cu-page-title">{{ __('admin.departments_title') }}</h2>
             <p class="cu-muted mt-1">{{ __('admin.departments_subtitle') }}</p>
         </div>
-        <a href="{{ route('admin.departments.create') }}" class="cu-btn-primary">{{ __('admin.add_department') }}</a>
+        <div class="flex gap-2">
+            <a href="{{ route('admin.departments.order') }}" class="cu-btn-secondary">{{ __('admin.sort_departments') }}</a>
+            <a href="{{ route('admin.departments.create') }}" class="cu-btn-primary">{{ __('admin.add_department') }}</a>
+        </div>
     </div>
 
     <div class="cu-table-wrap overflow-x-auto">
