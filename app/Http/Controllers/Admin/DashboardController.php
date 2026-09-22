@@ -312,14 +312,20 @@ class DashboardController extends Controller
         $sameDay = $record->end_date === null
             || $record->end_date->toDateString() === $record->start_date->toDateString();
 
+        $label = $sameDay
+            ? $record->start_date->format('d/m/Y')
+            : $record->start_date->format('d/m/Y').' - '.$record->end_date->format('d/m/Y');
+
+        if ($record->is_half_day) {
+            $label .= ' ('.__('admin.leave_day_half_tag').')';
+        }
+
         return [
             'id' => $record->id,
             'start' => $record->start_date->format('d/m/Y'),
             'end' => $record->end_date?->format('d/m/Y'),
             'half' => (bool) $record->is_half_day,
-            'label' => $sameDay
-                ? $record->start_date->format('d/m/Y')
-                : $record->start_date->format('d/m/Y').' - '.$record->end_date->format('d/m/Y'),
+            'label' => $label,
         ];
     }
 

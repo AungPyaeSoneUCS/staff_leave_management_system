@@ -669,11 +669,12 @@
     "admin.edit_day": "ခွင့်နေ့ ပြင်ဆင်ရန်",
     "admin.leave_day_start": "စတင်သည့်နေ့",
     "admin.leave_day_end": "ပြီးဆုံးသည့်နေ့",
-    "admin.leave_day_half": "တစ်ဝက်နေ့",
+    "admin.leave_day_half": "နေ့တစ်ဝက်",
     "admin.leave_day_delete_confirm": "ဤခွင့်နေ့ကို ဖျက်မည်လား။",
     "flash.leave_record_day_added": "ခွင့်နေ့ ထည့်သွင်းပြီးပါပြီ။",
     "flash.leave_record_day_updated": "ခွင့်နေ့ ပြင်ဆင်ပြီးပါပြီ။",
     "flash.leave_record_day_deleted": "ခွင့်နေ့ ဖျက်ပြီးပါပြီ။",
     "flash.leave_record_day_invalid": "ရက်စွဲမမှန်ကန်ပါ။ ခွင့်နေ့ကို သိမ်း၍မရပါ။",
-    "flash.leave_record_day_reason": "လက်ဖြင့် ခွင့်မှတ်တမ်း"
+    "flash.leave_record_day_reason": "လက်ဖြင့် ခွင့်မှတ်တမ်း",
+    "admin.leave_day_half_tag": "နေ့တစ်ဝက်"
 }

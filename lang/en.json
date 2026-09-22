@@ -680,5 +680,6 @@
     "flash.leave_record_day_updated": "Leave day updated.",
     "flash.leave_record_day_deleted": "Leave day deleted.",
     "flash.leave_record_day_invalid": "Invalid dates. The leave day could not be saved.",
-    "flash.leave_record_day_reason": "Manual leave record"
+    "flash.leave_record_day_reason": "Manual leave record",
+    "admin.leave_day_half_tag": "Half Day"
 }
