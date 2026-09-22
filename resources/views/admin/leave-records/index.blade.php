@@ -42,14 +42,17 @@
             <div class="cu-card cu-card-body">
                 <div class="overflow-x-auto">
                     <table class="w-full border-collapse text-sm" style="min-width: 1400px;">
+                        @php
+                            $totalColumns = $dayColumns + 5;
+                        @endphp
                         <thead>
                             <tr>
-                                <th colspan="14" class="border border-slate-400 bg-slate-100 px-3 py-2.5 text-center text-base font-bold leading-relaxed">
+                                <th colspan="{{ $totalColumns }}" class="border border-slate-400 bg-slate-100 px-3 py-2.5 text-center text-base font-bold leading-relaxed">
                                     {{ $bookTitle }}
                                 </th>
                             </tr>
                             <tr>
-                                <th colspan="14" class="border border-slate-400 bg-slate-100 px-3 py-2.5 text-center text-sm font-bold">
+                                <th colspan="{{ $totalColumns }}" class="border border-slate-400 bg-slate-100 px-3 py-2.5 text-center text-sm font-bold">
                                     {{ app()->getLocale() == 'my' ? $department->name_mm ?? $department->name : $department->name }}
                                 </th>
                             </tr>
@@ -58,10 +61,17 @@
                                 <th rowspan="2" class="border border-slate-400 bg-slate-100 px-3 py-2 text-left">{{ __('common.name') }}</th>
                                 <th rowspan="2" class="border border-slate-400 bg-slate-100 px-3 py-2 text-center">{{ __('common.position') }}</th>
                                 <th rowspan="2" class="border border-slate-400 bg-slate-100 px-3 py-2 text-left">{{ __('common.leave_type') }}</th>
-                                <th colspan="10" class="border border-slate-400 bg-slate-100 px-3 py-2 text-center">{{ __('admin.leave_taking_date') }}</th>
+                                <th colspan="{{ $dayColumns }}" class="border border-slate-400 bg-slate-100 px-3 py-2 text-center">{{ __('admin.leave_taking_date') }}</th>
+                                <th rowspan="2" class="w-14 border border-slate-400 bg-slate-100 px-1 py-2 text-center">
+                                    <form method="POST" action="{{ route('admin.leave-records.day-columns.add') }}">
+                                        @csrf
+                                        <button type="submit" title="{{ __('admin.leave_day_add_column') }}"
+                                            class="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-300 bg-white text-lg font-bold leading-none text-slate-600 hover:border-sky-500 hover:bg-sky-50 hover:text-sky-700">&plus;</button>
+                                    </form>
+                                </th>
                             </tr>
                             <tr>
-                                @foreach(range(1, 10) as $i)
+                                @foreach(range(1, $dayColumns) as $i)
                                     <th class="w-24 border border-slate-400 bg-slate-100 px-1 py-1.5 text-center text-xs">{{ $i }}</th>
                                 @endforeach
                             </tr>
@@ -79,7 +89,7 @@
                                     <td rowspan="6" class="border border-slate-400 px-3 py-1.5 align-middle font-medium text-slate-900">{{ $name }}</td>
                                     <td rowspan="6" class="border border-slate-400 px-3 py-1.5 text-center align-middle text-slate-700">{{ $position }}</td>
                                     <td class="border border-slate-400 px-3 py-1.5 text-center text-slate-700">{{ $templateRows[0]['mm'] }}</td>
-                                    @foreach(range(1, 10) as $i)
+                                    @foreach(range(1, $dayColumns) as $i)
                                         <td class="w-24 border border-slate-400 px-1 py-1 align-top">
                                             @include('admin.leave-records._day-cell', ['cell' => $templateRows[0]['dates'][$i - 1] ?? null, 'user' => $user, 'name' => $name, 'leaveType' => $templateRows[0]['type']])
                                         </td>
@@ -88,7 +98,7 @@
                                 @foreach(array_slice($templateRows, 1) as $templateRow)
                                     <tr>
                                         <td class="border border-slate-400 px-3 py-1.5 text-center text-slate-700">{{ $templateRow['mm'] }}</td>
-                                        @foreach(range(1, 10) as $i)
+                                        @foreach(range(1, $dayColumns) as $i)
                                             <td class="w-24 border border-slate-400 px-1 py-1 align-top">
                                                 @include('admin.leave-records._day-cell', ['cell' => $templateRow['dates'][$i - 1] ?? null, 'user' => $user, 'name' => $name, 'leaveType' => $templateRow['type']])
                                             </td>
@@ -97,7 +107,7 @@
                                 @endforeach
                             @empty
                                 <tr>
-                                    <td colspan="14" class="border border-slate-400 px-3 py-8 text-center text-slate-500">{{ __('admin.leave_records_empty') }}</td>
+                                    <td colspan="{{ $totalColumns }}" class="border border-slate-400 px-3 py-8 text-center text-slate-500">{{ __('admin.leave_records_empty') }}</td>
                                 </tr>
                             @endforelse
                         </tbody>

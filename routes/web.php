@@ -215,9 +215,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/leave-import/calculate-total-days', [LeaveImportController::class, 'calculateTotalDaysApi'])->name('leave-import.calculate-total-days');
         Route::get('/leave-records', [AdminDashboardController::class, 'leaveRecords'])->name('leave-records');
         Route::get('/leave-records/export', [AdminDashboardController::class, 'exportLeaveRecords'])->name('leave-records.export');
-        Route::get('/leave-records/order', [AdminDashboardController::class, 'leaveRecordOrder'])->name('leave-records.order');
+Route::get('/leave-records/order', [AdminDashboardController::class, 'leaveRecordOrder'])->name('leave-records.order');
+
         Route::post('/leave-records/order', [AdminDashboardController::class, 'saveLeaveRecordOrder'])->name('leave-records.order.save');
 
+        Route::post('/leave-records/day-columns/add', [AdminDashboardController::class, 'addLeaveRecordDayColumns'])->name('leave-records.day-columns.add');
         Route::post('/leave-records/day', [LeaveRecordDayController::class, 'store'])->name('leave-records.day.store');
 
         Route::put('/leave-records/day/{leaveRequest}', [LeaveRecordDayController::class, 'update'])->name('leave-records.day.update');

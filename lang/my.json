@@ -676,5 +676,6 @@
     "flash.leave_record_day_deleted": "ခွင့်နေ့ ဖျက်ပြီးပါပြီ။",
     "flash.leave_record_day_invalid": "ရက်စွဲမမှန်ကန်ပါ။ ခွင့်နေ့ကို သိမ်း၍မရပါ။",
     "flash.leave_record_day_reason": "လက်ဖြင့် ခွင့်မှတ်တမ်း",
-    "admin.leave_day_half_tag": "နေ့တစ်ဝက်"
+    "admin.leave_day_half_tag": "နေ့တစ်ဝက်",
+    "admin.leave_day_add_column": "နေ့ကော်လံ ထည့်ရန်"
 }

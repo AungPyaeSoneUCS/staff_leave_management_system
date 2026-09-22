@@ -134,6 +134,8 @@ class DashboardController extends Controller
         $year = $validated['year'] ?? (int) now()->year;
         $departmentId = $validated['department_id'] ?? null;
 
+        $dayColumns = min(20, max(10, (int) session('leave_records_day_columns', 10)));
+
         $departments = Department::query()
             ->when($departmentId, fn ($query) => $query->whereKey($departmentId))
             ->ordered()
@@ -141,7 +143,7 @@ class DashboardController extends Controller
 
         $books = $departments->map(fn (Department $department) => [
             'department' => $department,
-            'staff' => $this->leaveRecordBookStaff($department, $year),
+            'staff' => $this->leaveRecordBookStaff($department, $year, $dayColumns),
         ]);
 
         $departmentList = Department::ordered()->get();
@@ -150,7 +152,15 @@ class DashboardController extends Controller
 
         $bookTitle = $this->leaveRecordBookTitle($year);
 
-        return view('admin.leave-records.index', compact('books', 'years', 'year', 'departmentId', 'bookTitle', 'departmentList'));
+        return view('admin.leave-records.index', compact('books', 'years', 'year', 'departmentId', 'bookTitle', 'departmentList', 'dayColumns'));
+    }
+
+    public function addLeaveRecordDayColumns()
+    {
+        $current = (int) session('leave_records_day_columns', 10);
+        session(['leave_records_day_columns' => min(20, $current + 1)]);
+
+        return back();
     }
 
     public function exportLeaveRecords(Request $request)
@@ -272,7 +282,7 @@ class DashboardController extends Controller
         return $rows;
     }
 
-    private function leaveRecordBookStaff(Department $department, int $year): \Illuminate\Support\Collection
+    private function leaveRecordBookStaff(Department $department, int $year, int $dayColumns = 10): \Illuminate\Support\Collection
     {
         $staff = $this->leaveRecordOrderedStaff($department);
 
@@ -285,17 +295,17 @@ class DashboardController extends Controller
             ->get()
             ->groupBy('user_id');
 
-        return $staff->map(function (User $user) use ($recordsByUser) {
+        return $staff->map(function (User $user) use ($recordsByUser, $dayColumns) {
             $userRecords = $recordsByUser->get($user->id, collect());
 
             return [
                 'user' => $user,
-                'rows' => array_map(function (array $row) use ($userRecords) {
+                'rows' => array_map(function (array $row) use ($userRecords, $dayColumns) {
                     $row['dates'] = $row['type'] !== null
                         ? $userRecords
                             ->where('leave_type_id', $row['type']->id)
                             ->filter(fn (LeaveRequest $record) => $record->start_date !== null)
-                            ->take(10)
+                            ->take($dayColumns)
                             ->map(fn (LeaveRequest $record) => $this->leaveRecordDayCell($record))
                             ->values()
                             ->all()
