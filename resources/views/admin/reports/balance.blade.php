@@ -71,9 +71,7 @@
                             <th>{{ __('common.staff') }}</th>
                             <th>{{ __('common.department') }}</th>
                             <th>{{ __('common.leave_type') }}</th>
-                            <th>{{ __('common.allocated_days') }}</th>
                             <th>{{ __('common.used_days') }}</th>
-                            <th>{{ __('common.remaining_days') }}</th>
                         </tr>
                     </thead>
                     <tbody id="balance-table-body">
@@ -169,22 +167,19 @@
                         grouped[name] = {
                             staff_name: name,
                             department: item.department,
-                            leave_type: item.leave_type || '',
-                            allocated_days: 0,
                             used_days: 0,
                             remaining_days: 0,
-                            is_not_limited: item.is_not_limited,
                         };
                     }
 
+                    grouped[name].used_days += Number(item.used_days_raw || 0);
+
                     if (!item.is_not_limited) {
-                        grouped[name].allocated_days += Number(item.allocated_days_raw || 0);
-                        grouped[name].used_days += Number(item.used_days_raw || 0);
                         grouped[name].remaining_days += Number(item.remaining_days_raw || 0);
                     }
                 });
 
-                const rows = Object.values(grouped);
+                const rows = Object.values(grouped).sort((a, b) => b.used_days - a.used_days);
 
                 tableBody.innerHTML = data.map((item, index) => `
                 <tr>
@@ -197,14 +192,9 @@
                     </td>
                     <td>${item.department}</td>
                     <td>${item.leave_type || ''}</td>
-                    <td>${item.allocated_days}</td>
                     <td>${item.used_days}</td>
-                    <td>${item.is_not_limited ? '-' : item.remaining_days}</td>
                 </tr>
             `).join('');
-
-                const usedTotal = rows.reduce((sum, item) => sum + (item.is_not_limited ? 0 : item.used_days), 0);
-                const remainingTotal = rows.reduce((sum, item) => sum + (item.is_not_limited ? 0 : item.remaining_days), 0);
 
                 if (window.balanceChartInstance) {
                     window.balanceChartInstance.destroy();
@@ -221,14 +211,14 @@
                         datasets: [
                             {
                                 label: '{{ __('common.used_days') }}',
-                                data: rows.map(item => item.is_not_limited ? 0 : item.used_days),
+                                data: rows.map(item => item.used_days),
                                 backgroundColor: '#ef4444',
                                 borderRadius: 6,
                                 maxBarThickness: 48,
                             },
                             {
                                 label: '{{ __('common.remaining_days') }}',
-                                data: rows.map(item => item.is_not_limited ? 0 : item.remaining_days),
+                                data: rows.map(item => item.remaining_days),
                                 backgroundColor: '#22c55e',
                                 borderRadius: 6,
                                 maxBarThickness: 48,
