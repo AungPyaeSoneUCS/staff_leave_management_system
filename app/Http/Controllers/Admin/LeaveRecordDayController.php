@@ -86,7 +86,13 @@ class LeaveRecordDayController extends Controller
 
     public function destroy(LeaveRequest $leaveRequest)
     {
-        $this->balanceService->updateUsedDays($leaveRequest->user, $leaveRequest->leaveType, -(float) $leaveRequest->total_days);
+        $user = $leaveRequest->user;
+        $leaveType = $leaveRequest->leaveType;
+
+        if ($user !== null && $leaveType !== null) {
+            $this->balanceService->updateUsedDays($user, $leaveType, -(float) $leaveRequest->total_days);
+        }
+
         $leaveRequest->delete();
 
         return back()->with('success', __('flash.leave_record_day_deleted'));
