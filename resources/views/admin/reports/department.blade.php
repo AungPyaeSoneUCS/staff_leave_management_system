@@ -58,6 +58,7 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script>
+    Chart.defaults.font.family = "'Plus Jakarta Sans', 'Instrument Sans', 'Pyidaungsu', 'Myanmar Text', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif";
     document.getElementById('department-search-btn').addEventListener('click', function () {
         const startDate = document.getElementById('report_start_date').value;
         const endDate = document.getElementById('report_end_date').value;

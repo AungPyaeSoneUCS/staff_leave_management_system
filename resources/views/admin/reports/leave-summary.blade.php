@@ -113,6 +113,7 @@
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
         <script>
+            Chart.defaults.font.family = "'Plus Jakarta Sans', 'Instrument Sans', 'Pyidaungsu', 'Myanmar Text', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif";
             const appLocale = '{{ app()->getLocale() }}';
             const summaryStaffSuggestions = <?php echo json_encode(\App\Models\User::where('role', 'staff')->orWhere('role', 'department_head')->get(['id', 'name', 'name_mm']), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
             const summaryDepartmentSuggestions = <?php echo json_encode($departments->map(fn($d) => ['id' => $d->id, 'name' => $d->name, 'name_mm' => $d->name_mm])->values()->all(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;

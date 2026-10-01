@@ -52,6 +52,7 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script>
+    Chart.defaults.font.family = "'Plus Jakarta Sans', 'Instrument Sans', 'Pyidaungsu', 'Myanmar Text', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif";
     document.addEventListener('DOMContentLoaded', function () {
         fetch(`{{ route('admin.reports.daily-data') }}?start_date={{ now()->format('Y-m-d') }}&end_date={{ now()->format('Y-m-d') }}`, {
             headers: {
