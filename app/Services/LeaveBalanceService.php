@@ -24,8 +24,8 @@ class LeaveBalanceService
                 'leave_type' => $leaveType->name,
                 'leave_type_mm' => $leaveType->name_mm,
                 'allocated_days' => $balance->allocated_days,
-                'used_days' => $balance->used_days,
-                'remaining_days' => $balance->remaining_days,
+                'used_days' => max(0, (float) $balance->used_days),
+                'remaining_days' => max(0, (float) $balance->remaining_days),
                 'is_not_limited' => $leaveType->is_not_limited,
             ];
         }
@@ -45,7 +45,7 @@ class LeaveBalanceService
         $year = now()->year;
         $balance = $this->getOrCreateBalance($user, $leaveType, $year);
 
-        $balance->used_days = round((float) $balance->used_days + $days, 2);
+        $balance->used_days = round(max(0, (float) $balance->used_days + $days), 2);
         $balance->remaining_days = round(max(0, (float) $balance->allocated_days - (float) $balance->used_days), 2);
         $balance->save();
     }
@@ -73,9 +73,9 @@ class LeaveBalanceService
                 'year' => $year,
             ],
             [
-                'allocated_days' => $leaveType->annual_allocation,
+                'allocated_days' => (float) ($leaveType->annual_allocation ?? 0),
                 'used_days' => 0,
-                'remaining_days' => $leaveType->annual_allocation,
+                'remaining_days' => (float) ($leaveType->annual_allocation ?? 0),
             ]
         );
     }

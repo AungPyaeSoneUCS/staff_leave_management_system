@@ -10,6 +10,7 @@ use App\Services\LeaveBalanceService;
 use App\Services\LeaveWorkflowService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class LeaveRecordDayController extends Controller
 {
@@ -49,7 +50,7 @@ class LeaveRecordDayController extends Controller
             'is_half_day' => $data['half'],
         ]);
 
-        $this->balanceService->updateUsedDays($user, $leaveType, (float) $data['total']);
+        $this->safeBalanceUpdate($user, $leaveType, (float) $data['total']);
 
         return back()->with('success', __('flash.leave_record_day_added'));
     }
@@ -72,9 +73,6 @@ class LeaveRecordDayController extends Controller
 
         $oldTotal = (float) $leaveRequest->total_days;
 
-        $user = $leaveRequest->user;
-        $leaveType = $leaveRequest->leaveType;
-
         $leaveRequest->update([
             'start_date' => $data['start'],
             'end_date' => $data['end'],
@@ -82,25 +80,36 @@ class LeaveRecordDayController extends Controller
             'is_half_day' => $data['half'],
         ]);
 
-        if ($user !== null && $leaveType !== null) {
-            $this->balanceService->updateUsedDays($user, $leaveType, (float) $data['total'] - $oldTotal);
-        }
+        $this->safeBalanceUpdate($leaveRequest->user, $leaveRequest->leaveType, (float) $data['total'] - $oldTotal);
 
         return back()->with('success', __('flash.leave_record_day_updated'));
     }
 
     public function destroy(LeaveRequest $leaveRequest)
     {
-        $user = $leaveRequest->user;
-        $leaveType = $leaveRequest->leaveType;
-
-        if ($user !== null && $leaveType !== null) {
-            $this->balanceService->updateUsedDays($user, $leaveType, -(float) $leaveRequest->total_days);
-        }
+        $this->safeBalanceUpdate($leaveRequest->user, $leaveRequest->leaveType, -(float) $leaveRequest->total_days);
 
         $leaveRequest->delete();
 
         return back()->with('success', __('flash.leave_record_day_deleted'));
+    }
+
+    private function safeBalanceUpdate(?User $user, ?LeaveType $leaveType, float $days): void
+    {
+        if ($user === null || $leaveType === null) {
+            return;
+        }
+
+        try {
+            $this->balanceService->updateUsedDays($user, $leaveType, $days);
+        } catch (\Throwable $e) {
+            Log::warning('Leave balance update failed; record change kept.', [
+                'user_id' => $user->id,
+                'leave_type_id' => $leaveType->id,
+                'days' => $days,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**

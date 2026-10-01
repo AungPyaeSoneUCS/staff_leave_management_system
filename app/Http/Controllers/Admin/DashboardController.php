@@ -1420,9 +1420,9 @@ class DashboardController extends Controller
                     continue;
                 }
 
-                $allocated = $balance ? (float) $balance->allocated_days : (float) $leaveType->annual_allocation;
-                $used = $balance ? (float) $balance->used_days : 0;
-                $remaining = $balance ? (float) $balance->remaining_days : (float) $leaveType->annual_allocation;
+                $allocated = $balance ? (float) $balance->allocated_days : (float) ($leaveType->annual_allocation ?? 0);
+                $used = max(0, $balance ? (float) $balance->used_days : 0);
+                $remaining = max(0, $balance ? (float) $balance->remaining_days : (float) ($leaveType->annual_allocation ?? 0));
 
                 $data[] = [
                     'staff_name' => $this->localizedName($user->name, $user->name_mm),

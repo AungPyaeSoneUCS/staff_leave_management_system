@@ -211,9 +211,9 @@ class AnalyticsService
                     'staff_id' => $user->staff_id ?? '—',
                     'department' => $user->department ? $this->localizedName($user->department->name, $user->department->name_mm) : '—',
                     'leave_type' => $this->localizedName($leaveType->name, $leaveType->name_mm),
-                    'allocated_days' => $balance ? (float) $balance->allocated_days : (float) $leaveType->annual_allocation,
-                    'used_days' => $balance ? (float) $balance->used_days : 0,
-                    'remaining_days' => $balance ? (float) $balance->remaining_days : (float) $leaveType->annual_allocation,
+                    'allocated_days' => $balance ? (float) $balance->allocated_days : (float) ($leaveType->annual_allocation ?? 0),
+                    'used_days' => max(0, $balance ? (float) $balance->used_days : 0),
+                    'remaining_days' => max(0, $balance ? (float) $balance->remaining_days : (float) ($leaveType->annual_allocation ?? 0)),
                     'is_not_limited' => $leaveType->is_not_limited,
                     'profile_image' => $user->profile_image,
                 ];
