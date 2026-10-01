@@ -72,6 +72,9 @@ class LeaveRecordDayController extends Controller
 
         $oldTotal = (float) $leaveRequest->total_days;
 
+        $user = $leaveRequest->user;
+        $leaveType = $leaveRequest->leaveType;
+
         $leaveRequest->update([
             'start_date' => $data['start'],
             'end_date' => $data['end'],
@@ -79,7 +82,9 @@ class LeaveRecordDayController extends Controller
             'is_half_day' => $data['half'],
         ]);
 
-        $this->balanceService->updateUsedDays($leaveRequest->user, $leaveRequest->leaveType, (float) $data['total'] - $oldTotal);
+        if ($user !== null && $leaveType !== null) {
+            $this->balanceService->updateUsedDays($user, $leaveType, (float) $data['total'] - $oldTotal);
+        }
 
         return back()->with('success', __('flash.leave_record_day_updated'));
     }
