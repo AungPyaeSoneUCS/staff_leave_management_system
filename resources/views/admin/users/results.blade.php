@@ -46,7 +46,7 @@
                     </tr>
                 </thead>
             <tbody>
-                @foreach($users as $user)
+                @forelse($users as $user)
                     <tr>
                         <td>{{ config('app.locale') == 'my' ? my_number($users->firstItem() + $loop->index) : $users->firstItem() + $loop->index }}</td>
                         <td class="primary">
@@ -98,7 +98,11 @@
                             @endif
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="10" class="text-center py-10 text-slate-500">{{ __('common.no_data') }}</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

@@ -62,7 +62,7 @@
                             {{ app()->getLocale() == 'my' ? ($assignment->admin->name_mm ?? $assignment->admin->name) : $assignment->admin->name }}
                         </td>
                         <td class="line-clamp-2 text-sm">{{ $assignment->reason ?: '—' }}</td>
-                        <td>{{\App\Support\MyanmarDateFormatter::format($assignment->created_at, 'M d, Y H:i')}}</td>
+                        <td>{{\App\Support\MyanmarDateFormatter::format($assignment->created_at, 'd/m/Y H:i')}}</td>
                         <td>
                             <form action="{{ route('super-admin.assignments.destroy', $assignment) }}" method="POST" class="inline">
                                 @csrf

@@ -31,6 +31,7 @@ class LeaveRequestStatusUpdatedNotification extends Notification implements Shou
             'updated' => 'leave_request_updated',
             'dept_approved' => 'dept_head_approved',
             'revoked' => 'leave_request_updated',
+            'cancelled' => 'leave_request_cancelled',
             'duty_exchange_accepted' => 'duty_exchange_accepted',
             default => 'leave_request_approved',
         };
@@ -52,10 +53,10 @@ class LeaveRequestStatusUpdatedNotification extends Notification implements Shou
         }
 
         $url = match (true) {
-            $notifiable->isStaff() => route('staff.leave-requests.show', $this->leaveRequest, false),
-            $notifiable->isDepartmentHead() => route('department-head.approvals.show', $this->leaveRequest, false),
-            $notifiable->isAdmin() => route('central-admin.approvals.show', $this->leaveRequest, false),
-            $notifiable->isSuperAdmin() => route('central-admin.approvals.show', $this->leaveRequest, false),
+            $notifiable->isStaff() => mail_route('staff.leave-requests.show', $this->leaveRequest),
+            $notifiable->isDepartmentHead() => mail_route('department-head.approvals.show', $this->leaveRequest),
+            $notifiable->isAdmin() => mail_route('central-admin.approvals.show', $this->leaveRequest),
+            $notifiable->isSuperAdmin() => mail_route('central-admin.approvals.show', $this->leaveRequest),
             default => '#',
         };
 
@@ -83,6 +84,7 @@ class LeaveRequestStatusUpdatedNotification extends Notification implements Shou
             'updated' => __('notifications.leave_request_updated'),
             'dept_approved' => __('notifications.dept_head_approved_title'),
             'duty_exchange_accepted' => __('notifications.duty_exchange_accepted_title'),
+            'cancelled' => __('notifications.leave_request_cancelled'),
             default => __('notifications.leave_request_status_updated'),
         };
 
@@ -112,6 +114,10 @@ class LeaveRequestStatusUpdatedNotification extends Notification implements Shou
             'duty_exchange_accepted' => __('notifications.duty_exchange_accepted_message', [
                 'user' => $exchangeUserName,
             ]),
+            'cancelled' => __('notifications.request_cancelled_message', [
+                'days' => $this->leaveRequest->total_days,
+                'leave_type' => $leaveTypeName,
+            ]),
             default => __('notifications.status_update_message', [
                 'days' => $this->leaveRequest->total_days,
                 'status' => __("common.{$this->status}"),
@@ -133,8 +139,8 @@ class LeaveRequestStatusUpdatedNotification extends Notification implements Shou
             'leave_request_id' => $this->leaveRequest->id,
             'leave_type' => $leaveTypeName,
             'total_days' => $this->leaveRequest->total_days,
-            'start_date' => MyanmarDateFormatter::format($this->leaveRequest->start_date, 'F d, Y'),
-            'end_date' => MyanmarDateFormatter::format($this->leaveRequest->end_date, 'F d, Y'),
+            'start_date' => MyanmarDateFormatter::format($this->leaveRequest->start_date, 'd/m/Y'),
+            'end_date' => MyanmarDateFormatter::format($this->leaveRequest->end_date, 'd/m/Y'),
             'status' => $this->status,
         ];
     }

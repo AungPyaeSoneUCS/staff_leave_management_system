@@ -48,7 +48,7 @@
                     </tr>
             </thead>
             <tbody>
-                @foreach($processedRequests as $request)
+                @forelse($processedRequests as $request)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td class="primary">
@@ -72,10 +72,10 @@
                             {{ app()->getLocale() == 'my' ? ($request->user->position_mm ?? $request->user->position) : $request->user->position }}
                         </td>
                         <td>
-                            {{ $request->start_date ? \App\Support\MyanmarDateFormatter::format($request->start_date, 'F d, Y') : __('common.n_a') }}
+                            {{ $request->start_date ? \App\Support\MyanmarDateFormatter::format($request->start_date, 'd/m/Y') : __('common.n_a') }}
                         </td>
                         <td>
-                            {{ $request->end_date ? \App\Support\MyanmarDateFormatter::format($request->end_date, 'F d, Y') : __('common.n_a') }}
+                            {{ $request->end_date ? \App\Support\MyanmarDateFormatter::format($request->end_date, 'd/m/Y') : __('common.n_a') }}
                         </td>
                         <td>{{ $request->leaveType->is_not_limited ? '-' : ($request->is_half_day ? __('common.half_day') : my_number($request->total_days)) }}</td>
                         <td>
@@ -101,15 +101,19 @@
                                 {{ __('common.' . $request->status) }}
                             </span>
                         </td>
-                        <td>{{ $request->reviewed_at ? \App\Support\MyanmarDateFormatter::format($request->reviewed_at, 'F d, Y') : __('common.n_a') }}</td>
+                        <td>{{ $request->reviewed_at ? \App\Support\MyanmarDateFormatter::format($request->reviewed_at, 'd/m/Y') : __('common.n_a') }}</td>
                         <td>{{ app()->getLocale() == 'my' ? $request->reviewer->name_mm ?? $request->reviewer->name : $request->reviewer->name ?? ($request->hr->name ?? __('common.n_a')) }}</td>
                         <td>
-                            <a href="{{ route('department-head.approvals.show', $request) }}" class="inline-flex items-center px-4 py-1.5 rounded-full text-sm text-amber-700 bg-amber-50 border border-amber-200 shadow-sm shadow-amber-600/10 transition-all duration-150 hover:bg-amber-100 hover:border-amber-300 hover:shadow-md" title="{{ __('common.view') }}">
+                            <a href="{{ route('department-head.approvals.show', $request) }}" class="cu-btn-amber-nude !px-3 !py-1.5 text-xs" title="{{ __('common.view') }}">
                                 {{ __('common.view') }}
                             </a>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="13" class="text-center py-10 text-slate-500">{{ __('common.no_data') }}</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

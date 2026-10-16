@@ -9,9 +9,14 @@
             <h2 class="cu-page-title">{{ __('notifications.all_title') }}</h2>
             <p class="cu-muted mt-1">{{ __('notifications.all_subtitle') }}</p>
         </div>
-        <button onclick="markAllNotificationsRead()" class="cu-btn-primary" id="page-mark-all-read-btn">
-            {{ __('notifications.mark_all_read') }}
-        </button>
+        <div class="flex items-center gap-2">
+            <button onclick="markAllNotificationsRead()" class="cu-btn-primary" id="page-mark-all-read-btn">
+                {{ __('notifications.mark_all_read') }}
+            </button>
+            <button onclick="clearReadNotifications()" class="cu-btn-secondary" id="page-clear-read-btn">
+                {{ __('notifications.clear_read') }}
+            </button>
+        </div>
     </div>
 
     <div class="cu-card cu-card-body">
@@ -60,7 +65,7 @@
                                 </div>
                                 <p class="text-sm text-slate-600 line-clamp-2">{{ $message }}</p>
                                 <div class="flex items-center gap-3 mt-2">
-                                    <span class="text-xs text-slate-400">{{ $notification->created_at->diffForHumans() }}</span>
+                                    <span class="text-xs text-slate-400">{{ \App\Support\MyanmarDateFormatter::format($notification->created_at, 'd/m/Y H:i') }}</span>
                                     @if($isUnread)
                                         <form method="POST" action="{{ route('notifications.read', $notification) }}" class="inline">
                                             @csrf
@@ -75,6 +80,13 @@
                                             {{ __('notifications.view_request') }}
                                         </a>
                                     @endif
+                                    <form method="POST" action="{{ route('notifications.destroy', $notification) }}" class="inline" data-confirm="{{ __('notifications.confirm_delete') }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-xs font-medium text-rose-600 hover:text-rose-700 transition-colors">
+                                            {{ __('notifications.delete') }}
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -101,6 +113,23 @@ function markAllNotificationsRead() {
         }
     }).then(function() {
         window.location.reload();
+    });
+}
+
+function clearReadNotifications() {
+    showConfirmModal('{{ __('notifications.confirm_clear_read') }}').then(function(confirmed) {
+        if (!confirmed) {
+            return;
+        }
+        fetch('/notifications/clear-read', {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                'Accept': 'application/json',
+            }
+        }).then(function() {
+            window.location.reload();
+        });
     });
 }
 </script>

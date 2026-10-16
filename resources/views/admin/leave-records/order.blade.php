@@ -40,7 +40,7 @@
                 @foreach($departments as $block)
                     @php $department = $block['department']; $staff = $block['staff']; @endphp
                     <div class="cu-card cu-card-body">
-                        <h3 class="mb-3 text-base font-semibold text-slate-800">
+                        <h3 class="cu-section-title mb-3">
                             {{ app()->getLocale() == 'my' ? $department->name_mm ?? $department->name : $department->name }}
                         </h3>
 

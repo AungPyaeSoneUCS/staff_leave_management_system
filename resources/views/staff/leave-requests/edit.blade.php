@@ -62,7 +62,7 @@
                             {{ __('common.view_document') }}
                         </a>
                         <div class="mt-2 flex items-center gap-2">
-                            <input type="checkbox" name="remove_attachment" id="remove_attachment" value="1" class="rounded border-slate-300 text-cu-600 focus:ring-cu-500">
+                            <input type="checkbox" name="remove_attachment" id="remove_attachment" value="1" class="cu-checkbox">
                             <label for="remove_attachment" class="text-sm text-slate-700">{{ __('staff.remove_attachment') }}</label>
                         </div>
                     </div>

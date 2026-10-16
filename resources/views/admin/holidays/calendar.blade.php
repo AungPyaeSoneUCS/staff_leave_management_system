@@ -29,7 +29,8 @@
             </button>
         </div>
 
-        <div class="grid grid-cols-7 gap-px bg-slate-200 rounded-xl overflow-hidden">
+        <div class="overflow-x-auto -mx-2 px-2">
+            <div class="grid grid-cols-7 gap-px bg-slate-200 rounded-xl overflow-hidden min-w-[640px]">
             @foreach(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as $day)
                 <div class="bg-slate-50 p-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     {{ $day }}
@@ -52,18 +53,17 @@
                     $currentDate = \Carbon\Carbon::create($year, $month, $day);
                     $dateKey = $currentDate->format('Y-m-d');
                     $holiday = $holidays->get($dateKey);
-                    $isWeekend = $currentDate->isWeekend();
                     $isToday = $dateKey === $today;
                     $isReplacement = $holiday && $holiday->replaced_holiday_id !== null;
                 @endphp
-                <div class="bg-white p-2 min-h-[100px] {{ $isWeekend ? 'bg-slate-50' : '' }} {{ $isToday ? 'ring-2 ring-primary-500 ring-inset' : '' }} hover:bg-slate-50 transition-colors cursor-pointer"
+                <div class="bg-white p-2 min-h-[100px] {{ $isToday ? 'ring-2 ring-primary-500 ring-inset' : '' }} hover:bg-slate-50 transition-colors cursor-pointer"
                      onclick="openModal('{{ $dateKey }}')">
                     <div class="flex items-center justify-between">
-                        <div class="text-sm font-medium {{ $isToday ? 'text-primary-600' : ($isWeekend ? 'text-slate-500' : 'text-slate-700') }}">
+                        <div class="text-sm font-medium {{ $isToday ? 'text-primary-600' : 'text-slate-700' }}">
                             {{ $day }}
                         </div>
                         @if($holiday)
-                            <input type="checkbox" class="holiday-checkbox rounded border-slate-300 text-cu-600 focus:ring-cu-500" value="{{ $dateKey }}" data-id="{{ $holiday->id }}" onclick="event.stopPropagation()">
+                            <input type="checkbox" class="holiday-checkbox cu-checkbox" value="{{ $dateKey }}" data-id="{{ $holiday->id }}" onclick="event.stopPropagation()">
                         @endif
                     </div>
                     @if($holiday)
@@ -81,6 +81,7 @@
                     @endif
                 </div>
             @endfor
+            </div>
         </div>
     </div>
 </div>
@@ -122,12 +123,12 @@
             </div>
 
             <div class="mb-6 flex items-center gap-2">
-                <input type="checkbox" name="is_recurring" id="holiday-recurring" value="1" class="rounded border-slate-300 text-cu-600 focus:ring-cu-500">
+                <input type="checkbox" name="is_recurring" id="holiday-recurring" value="1" class="cu-checkbox">
                 <label for="holiday-recurring" class="text-sm text-slate-700">{{ __('admin.recurring_holiday') }}</label>
             </div>
 
             <div class="mb-6 flex items-center gap-2">
-                <input type="checkbox" name="is_default" id="holiday-default" value="1" class="rounded border-slate-300 text-cu-600 focus:ring-cu-500">
+                <input type="checkbox" name="is_default" id="holiday-default" value="1" class="cu-checkbox">
                 <label for="holiday-default" class="text-sm text-slate-700">{{ __('admin.default_holiday') }}</label>
             </div>
 
@@ -247,7 +248,7 @@ function saveHoliday(event) {
     })
     .catch(err => {
         console.error(err);
-        alert('{{ __('flash.error') }}');
+        showAlertModal('{{ __('flash.error') }}');
     });
 }
 

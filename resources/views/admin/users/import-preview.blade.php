@@ -18,8 +18,8 @@
         </div>
 
         @if($hasConflicts)
-            <div class="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                <p class="text-sm text-amber-800">
+            <div class="cu-alert-warning">
+                <p>
                     <strong>{{ __('admin.conflicts_detected') }}</strong>
                 </p>
             </div>

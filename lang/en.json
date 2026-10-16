@@ -682,5 +682,19 @@
     "flash.leave_record_day_invalid": "Invalid dates. The leave day could not be saved.",
     "flash.leave_record_day_reason": "Manual leave record",
     "admin.leave_day_half_tag": "Half Day",
-    "admin.leave_day_add_column": "Add day column"
+    "admin.leave_day_add_column": "Add day column",
+    "notifications.clear_read": "Clear read",
+    "notifications.delete": "Delete",
+    "notifications.confirm_delete": "Delete this notification?",
+    "notifications.confirm_clear_read": "Delete all read notifications?",
+    "notifications.leave_request_cancelled": "Leave request cancelled",
+    "notifications.request_cancelled_message": "The :leave_type leave request of :days day(s) was cancelled.",
+    "flash.notification_deleted": "Notification deleted.",
+    "flash.notifications_cleared": "Read notifications cleared.",
+    "common.action": "Action",
+    "common.staff_name": "Staff Name",
+    "super_admin.pending_assignments_title": "Pending Assignments",
+    "super_admin.pending_assignments_subtitle": "Assign admins to pending level 2 leave requests",
+    "super_admin.no_pending_level2": "No pending level 2 leave requests to assign",
+    "super_admin.remove_assignment": "Remove this admin assignment?"
 }

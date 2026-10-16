@@ -63,7 +63,7 @@
                 <thead>
                     <tr>
                         <th width="30" class="text-center">
-                            <input type="checkbox" id="select-all" class="rounded border-slate-300 text-cu-600 focus:ring-cu-500">
+                            <input type="checkbox" id="select-all" class="cu-checkbox">
                         </th>
                         <th>{{ __('common.number') }}</th>
                         <th>{{ __('common.name') }}</th>
@@ -81,10 +81,10 @@
                     </tr>
                 </thead>
             <tbody>
-                @foreach($processedRequests as $request)
+                @forelse($processedRequests as $request)
                     <tr>
                         <td class="text-center">
-                            <input type="checkbox" name="selected[]" value="{{ $request->id }}" class="row-checkbox rounded border-slate-300 text-cu-600 focus:ring-cu-500">
+                            <input type="checkbox" name="selected[]" value="{{ $request->id }}" class="row-checkbox cu-checkbox">
                         </td>
                         <td>{{ $loop->iteration }}</td>
                         <td class="primary">
@@ -111,10 +111,10 @@
                             {{ $request->user->department ? (app()->getLocale() == 'my' ? ($request->user->department->name_mm ?? $request->user->department->name) : $request->user->department->name) : __('common.n_a') }}
                         </td>
                         <td>
-                            {{\App\Support\MyanmarDateFormatter::format($request->start_date, 'F d, Y')}}
+                            {{\App\Support\MyanmarDateFormatter::format($request->start_date, 'd/m/Y')}}
                         </td>
                         <td>
-                            {{ $request->end_date ? \App\Support\MyanmarDateFormatter::format($request->end_date, 'F d, Y') : __('common.unlimited') }}
+                            {{ $request->end_date ? \App\Support\MyanmarDateFormatter::format($request->end_date, 'd/m/Y') : __('common.unlimited') }}
                         </td>
                         <td>{{ $request->leaveType->is_not_limited ? '-' : ($request->is_half_day ? __('common.half_day') : my_number($request->total_days)) }}</td>
                         <td>
@@ -140,14 +140,18 @@
                                 {{ __('common.' . $request->status) }}
                             </span>
                         </td>
-                        <td>{{ $request->reviewed_at ? \App\Support\MyanmarDateFormatter::format($request->reviewed_at, 'F d, Y') : __('common.n_a') }}</td>
+                        <td>{{ $request->reviewed_at ? \App\Support\MyanmarDateFormatter::format($request->reviewed_at, 'd/m/Y') : __('common.n_a') }}</td>
                         <td>
                             <div class="flex items-center justify-center gap-2">
                                 <a href="{{ route('central-admin.approvals.show', $request) }}" class="cu-btn-secondary !px-3 !py-1.5 !rounded-full text-xs">{{ __('common.view') }}</a>
                             </div>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="14" class="text-center py-10 text-slate-500">{{ __('common.no_data') }}</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

@@ -79,7 +79,7 @@
                         <thead>
                                 <tr>
                                     <th width="30" class="text-center">
-                                        <input type="checkbox" id="select-all" class="rounded border-slate-300 text-cu-600 focus:ring-cu-500">
+                                        <input type="checkbox" id="select-all" class="cu-checkbox">
                                     </th>
                                     <th>{{ __('common.number') }}</th>
                                     <th>{{ __('common.name') }}</th>
@@ -99,7 +99,7 @@
                             @foreach($pendingRequests as $request)
                                 <tr>
                                     <td class="text-center">
-                                        <input type="checkbox" name="selected[]" value="{{ $request->id }}" class="row-checkbox rounded border-slate-300 text-cu-600 focus:ring-cu-500" onclick="event.stopPropagation()">
+                                        <input type="checkbox" name="selected[]" value="{{ $request->id }}" class="row-checkbox cu-checkbox" onclick="event.stopPropagation()">
                                     </td>
                                     <td>{{ $loop->iteration }}</td>
                                     <td class="primary">
@@ -124,10 +124,10 @@
                                     </td>
                                     <td>{{ $request->user->department->name ?? __('common.no_department') }}</td>
                                     <td>
-                                        {{\App\Support\MyanmarDateFormatter::format($request->start_date, 'F d, Y')}}
+                                        {{\App\Support\MyanmarDateFormatter::format($request->start_date, 'd/m/Y')}}
                                     </td>
                                     <td>
-                                        {{ $request->end_date ? \App\Support\MyanmarDateFormatter::format($request->end_date, 'F d, Y') : __('common.unlimited') }}
+                                        {{ $request->end_date ? \App\Support\MyanmarDateFormatter::format($request->end_date, 'd/m/Y') : __('common.unlimited') }}
                                     </td>
                                     <td>{{ $request->leaveType->is_not_limited ? '-' : ($request->is_half_day ? __('common.half_day') : my_number($request->total_days)) }}</td>
                                     <td>

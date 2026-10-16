@@ -45,15 +45,17 @@ class DutyExchangeController extends Controller
 
         $validated = $request->validate([
             'remarks' => 'nullable|string|max:500',
+            'signature' => 'required|string',
         ]);
 
         $leaveRequest->update([
             'duty_exchange_status' => 'accepted',
             'duty_exchange_confirmed_at' => now(),
             'duty_exchange_remarks' => $validated['remarks'] ?? null,
+            'duty_exchange_signature' => $validated['signature'],
         ]);
 
-        $leaveRequest->user->notify(new LeaveRequestStatusUpdatedNotification($leaveRequest, 'duty_exchange_accepted'));
+        notify_safe($leaveRequest->user, new LeaveRequestStatusUpdatedNotification($leaveRequest, 'duty_exchange_accepted'));
 
         $this->forwardToNextApprover($leaveRequest);
 
@@ -69,6 +71,7 @@ class DutyExchangeController extends Controller
 
         $validated = $request->validate([
             'remarks' => 'required|string|max:500',
+            'signature' => 'required|string',
         ]);
 
         $leaveRequest->update([
@@ -76,9 +79,10 @@ class DutyExchangeController extends Controller
             'duty_exchange_status' => 'rejected',
             'duty_exchange_confirmed_at' => now(),
             'duty_exchange_remarks' => $validated['remarks'],
+            'duty_exchange_signature' => $validated['signature'],
         ]);
 
-        $leaveRequest->user->notify(new LeaveRequestStatusUpdatedNotification($leaveRequest, 'rejected'));
+        notify_safe($leaveRequest->user, new LeaveRequestStatusUpdatedNotification($leaveRequest, 'rejected'));
 
         return redirect()->route('duty-exchange.index')
             ->with('success', __('duty_exchange.reject_success'));
@@ -98,7 +102,7 @@ class DutyExchangeController extends Controller
                 ->whereIn('id', AdminAssignment::select('admin_id'))
                 ->get()
                 ->each(function ($admin) use ($leaveRequest) {
-                    $admin->notify(new LeaveRequestSubmittedNotification($leaveRequest, 'admin'));
+                    notify_safe($admin, new LeaveRequestSubmittedNotification($leaveRequest, 'admin'));
                 });
 
             return;
@@ -108,7 +112,7 @@ class DutyExchangeController extends Controller
         $departmentHead = $departmentHeadId ? User::find($departmentHeadId) : null;
 
         if ($departmentHead && $departmentHead->id !== $requester->id) {
-            $departmentHead->notify(new LeaveRequestSubmittedNotification($leaveRequest, 'department_head'));
+            notify_safe($departmentHead, new LeaveRequestSubmittedNotification($leaveRequest, 'department_head'));
         }
 
         if ($departmentHead && $departmentHead->id === $requester->id) {
@@ -116,7 +120,7 @@ class DutyExchangeController extends Controller
                 ->whereIn('id', AdminAssignment::select('admin_id'))
                 ->get()
                 ->each(function ($admin) use ($leaveRequest) {
-                    $admin->notify(new LeaveRequestSubmittedNotification($leaveRequest, 'admin'));
+                    notify_safe($admin, new LeaveRequestSubmittedNotification($leaveRequest, 'admin'));
                 });
         }
     }

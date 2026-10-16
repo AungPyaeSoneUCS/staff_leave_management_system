@@ -285,6 +285,14 @@
         @apply mb-4 rounded-xl px-4 py-3 text-sm font-medium border bg-rose-50 border-rose-200 text-rose-800;
     }
 
+    .cu-alert-warning {
+        @apply mb-4 rounded-xl px-4 py-3 text-sm font-medium border bg-amber-50 border-amber-200 text-amber-800;
+    }
+
+    .cu-alert-info {
+        @apply mb-4 rounded-xl px-4 py-3 text-sm font-medium border bg-sky-50 border-sky-200 text-sky-800;
+    }
+
     .cu-auth-page {
         @apply min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-bg;
     }

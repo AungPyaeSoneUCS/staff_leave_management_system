@@ -185,7 +185,7 @@
         <div class="report-title">{{ __('department_head.leave_report') }}</div>
 
         <div class="report-meta">
-            <span>{{ __('admin.generated') }}: {{\App\Support\MyanmarDateFormatter::format(now(), 'Y-m-d H:i')}}</span>
+            <span>{{ __('admin.generated') }}: {{\App\Support\MyanmarDateFormatter::format(now(), 'd/m/Y H:i')}}</span>
         </div>
 
         @if (! empty($filters['start_date']) || ! empty($filters['end_date']))

@@ -42,7 +42,7 @@ class AdminAssignmentController extends Controller
             ['reason' => $validated['reason']]
         );
 
-        $admin->notify(new AdminAssignedNotification($admin, $validated['reason']));
+        notify_safe($admin, new AdminAssignedNotification($admin, $validated['reason']));
 
         return back()->with('success', __('flash.assignment_created', ['count' => 1]));
     }

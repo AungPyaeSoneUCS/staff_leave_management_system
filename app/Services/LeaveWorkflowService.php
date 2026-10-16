@@ -150,43 +150,27 @@ class LeaveWorkflowService
         $start = Carbon::parse($startDate);
         $end = Carbon::parse($endDate);
 
+        // All calendar days (including Saturdays and Sundays) count as leave
+        // days. Only registered public holidays (with a concrete date) are
+        // excluded from the total.
         $holidays = Holiday::whereBetween('date', [$start->toDateString(), $end->toDateString()])
             ->get()
             ->keyBy(fn ($holiday) => $holiday->date->toDateString());
 
-        $defaultWeekendHolidays = Holiday::where('is_default', true)->get()->keyBy('id');
-
-        $workingDays = 0;
+        $totalDays = 0;
         for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
-            $dayOfWeek = $date->dayOfWeek;
-            $dateString = $date->toDateString();
-            $isWeekend = $dayOfWeek === Carbon::SATURDAY || $dayOfWeek === Carbon::SUNDAY;
-            $isReplacementWorkingDay = false;
-
-            if ($isWeekend) {
-                $holiday = $holidays->get($dateString);
-
-                if ($holiday && $holiday->replaced_holiday_id && isset($defaultWeekendHolidays[$holiday->replaced_holiday_id])) {
-                    $isReplacementWorkingDay = true;
-                }
-
-                if (! $isReplacementWorkingDay) {
-                    continue;
-                }
-            }
-
-            if ($holidays->has($dateString) && ! $isReplacementWorkingDay) {
+            if ($holidays->has($date->toDateString())) {
                 continue;
             }
 
-            $workingDays++;
+            $totalDays++;
         }
 
         if ($halfDay) {
-            return $workingDays / 2;
+            return $totalDays / 2;
         }
 
-        return $workingDays;
+        return $totalDays;
     }
 
     public function validateLeaveBalance(User $user, int $leaveTypeId, int|float $requestedDays): bool

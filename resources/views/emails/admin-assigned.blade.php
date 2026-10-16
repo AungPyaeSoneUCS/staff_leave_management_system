@@ -9,7 +9,7 @@
 {{ $texts['reason_label'] }}: {{ $reason ?: '—' }}
 @endcomponent
 
-@component('mail::button', ['url' => route('admin.dashboard')])
+@component('mail::button', ['url' => mail_route('admin.dashboard')])
 {{ $texts['action'] }}
 @endcomponent
 

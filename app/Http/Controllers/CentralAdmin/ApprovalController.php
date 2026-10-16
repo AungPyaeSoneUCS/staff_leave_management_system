@@ -73,15 +73,15 @@ class ApprovalController extends Controller
         );
 
         if ($result === 'pending_super_admin') {
-            $leaveRequest->user->notify(new LeaveRequestStatusUpdatedNotification($leaveRequest, 'pending_super_admin'));
+            notify_safe($leaveRequest->user, new LeaveRequestStatusUpdatedNotification($leaveRequest, 'pending_super_admin'));
 
             $superAdmin = User::where('role', 'super_admin')->first();
 
             if ($superAdmin) {
-                $superAdmin->notify(new LeaveRequestSubmittedNotification($leaveRequest, 'super_admin'));
+                notify_safe($superAdmin, new LeaveRequestSubmittedNotification($leaveRequest, 'super_admin'));
             }
         } else {
-            $leaveRequest->user->notify(new LeaveRequestStatusUpdatedNotification($leaveRequest, $result));
+            notify_safe($leaveRequest->user, new LeaveRequestStatusUpdatedNotification($leaveRequest, $result));
         }
 
         return redirect()->route('central-admin.approvals.pending')
@@ -107,7 +107,7 @@ class ApprovalController extends Controller
             $validated['signature']
         );
 
-        $leaveRequest->user->notify(new LeaveRequestStatusUpdatedNotification($leaveRequest, 'rejected'));
+        notify_safe($leaveRequest->user, new LeaveRequestStatusUpdatedNotification($leaveRequest, 'rejected'));
 
         return redirect()->route('central-admin.approvals.pending')
             ->with('success', __('flash.reject_success'));
@@ -188,15 +188,15 @@ class ApprovalController extends Controller
             );
 
             if ($result === 'pending_super_admin') {
-                $leaveRequest->user->notify(new LeaveRequestStatusUpdatedNotification($leaveRequest, 'pending_super_admin'));
+                notify_safe($leaveRequest->user, new LeaveRequestStatusUpdatedNotification($leaveRequest, 'pending_super_admin'));
 
                 $superAdmin = User::where('role', 'super_admin')->first();
 
                 if ($superAdmin) {
-                    $superAdmin->notify(new LeaveRequestSubmittedNotification($leaveRequest, 'super_admin'));
+                    notify_safe($superAdmin, new LeaveRequestSubmittedNotification($leaveRequest, 'super_admin'));
                 }
             } else {
-                $leaveRequest->user->notify(new LeaveRequestStatusUpdatedNotification($leaveRequest, $result));
+                notify_safe($leaveRequest->user, new LeaveRequestStatusUpdatedNotification($leaveRequest, $result));
             }
 
             $processed++;
@@ -222,7 +222,7 @@ class ApprovalController extends Controller
             $validated['reason']
         );
 
-        $leaveRequest->user->notify(new LeaveRequestStatusUpdatedNotification($leaveRequest, 'revoked'));
+        notify_safe($leaveRequest->user, new LeaveRequestStatusUpdatedNotification($leaveRequest, 'revoked'));
 
         return redirect()->route('central-admin.approvals.pending')
             ->with('success', __('flash.revoke_success'));

@@ -683,8 +683,8 @@ class DashboardController extends Controller
                 'staff_id' => $item->user->staff_id ?? '—',
                 'department' => $item->user->department ? (app()->getLocale() == 'my' ? ($item->user->department->name_mm ?? $item->user->department->name) : $item->user->department->name) : __('common.n_a'),
                 'leave_type' => app()->getLocale() == 'my' ? ($item->leaveType->name_mm ?? $item->leaveType->name) : $item->leaveType->name,
-                'start_date' => MyanmarDateFormatter::format($item->start_date, 'F d, Y'),
-                'end_date' => $item->end_date ? MyanmarDateFormatter::format($item->end_date, 'F d, Y') : '—',
+                'start_date' => MyanmarDateFormatter::format($item->start_date, 'd/m/Y'),
+                'end_date' => $item->end_date ? MyanmarDateFormatter::format($item->end_date, 'd/m/Y') : '—',
                 'total_days' => my_number($item->total_days),
                 'is_not_limited' => $item->leaveType->is_not_limited,
                 'status' => $item->status,
@@ -863,7 +863,7 @@ class DashboardController extends Controller
         $rowNum++;
 
         if (! empty($filterSummary)) {
-            $sheet->setCellValue('A'.$rowNum, __('admin.generated').': '.now()->format('Y-m-d H:i'));
+            $sheet->setCellValue('A'.$rowNum, __('admin.generated').': '.now()->format('d/m/Y H:i'));
             $rowNum++;
             foreach ($filterSummary as $label => $value) {
                 $sheet->setCellValue('A'.$rowNum, $label.': '.$value);
@@ -1190,13 +1190,13 @@ class DashboardController extends Controller
                 'staff_id' => $item->user->staff_id ?? '—',
                 'department' => $item->user->department ? $this->localizedName($item->user->department->name, $item->user->department->name_mm) : '—',
                 'leave_type' => $this->localizedName($item->leaveType->name, $item->leaveType->name_mm),
-                'start_date' => MyanmarDateFormatter::format($item->start_date, 'F d, Y'),
-                'end_date' => $item->end_date ? MyanmarDateFormatter::format($item->end_date, 'F d, Y') : '—',
+                'start_date' => MyanmarDateFormatter::format($item->start_date, 'd/m/Y'),
+                'end_date' => $item->end_date ? MyanmarDateFormatter::format($item->end_date, 'd/m/Y') : '—',
                 'total_days' => my_number($item->total_days),
                 'is_not_limited' => $item->leaveType->is_not_limited,
                 'status' => $item->status,
                 'reviewer' => $item->reviewer ? $this->localizedName($item->reviewer->name, $item->reviewer->name_mm) : '—',
-                'reviewed_at' => $item->reviewed_at ? MyanmarDateFormatter::format($item->reviewed_at, 'F d, Y') : '—',
+                'reviewed_at' => $item->reviewed_at ? MyanmarDateFormatter::format($item->reviewed_at, 'd/m/Y') : '—',
                 'profile_image' => $item->user->profile_image,
                 'duty_exchange' => $item->dutyExchangeUser ? $this->localizedName($item->dutyExchangeUser->name, $item->dutyExchangeUser->name_mm) : '—',
             ];

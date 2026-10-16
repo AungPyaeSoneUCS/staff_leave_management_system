@@ -33,7 +33,7 @@
                         </div>
                     </div>
 
-                    <h3 class="text-xs font-semibold text-slate-900 uppercase tracking-wide pt-2">{{ __('common.personal_information') }}</h3>
+                    <h3 class="cu-section-title pt-2">{{ __('common.personal_information') }}</h3>
 
                     <div>
                         <label for="name" class="cu-label text-xs">{{ __('common.full_name') }}</label>
@@ -45,7 +45,7 @@
 
                     <div>
                         <label for="postion" class="cu-label text-xs">{{ __('common.position') }}</label>
-                        <input type="position" value="{{ app()->getLocale() == 'my' ? $user->position_mm ?? $user->position : $user->position }}" class="cu-input text-sm" disabled>
+                        <input type="text" value="{{ app()->getLocale() == 'my' ? $user->position_mm ?? $user->position : $user->position }}" class="cu-input text-sm" disabled>
                     </div>
 
                     <div>
@@ -67,7 +67,7 @@
                 </div>
 
                 <div class="space-y-3">
-                    <h3 class="text-xs font-semibold text-slate-900 uppercase tracking-wide">{{ __('department-head.change_password') }}</h3>
+                    <h3 class="cu-section-title">{{ __('department-head.change_password') }}</h3>
 
                     <div>
                         <label for="current_password" class="cu-label text-xs">{{ __('department-head.current_password') }}</label>
@@ -85,10 +85,10 @@
                                     <line x1="1" y1="1" x2="23" y2="23"></line>
                                 </svg>
                             </span>
-                                                @error('current_password')
+                        </div>
+                        @error('current_password')
                             <p class="cu-form-error text-xs">{{ $message }}</p>
                         @enderror
-                        </div>
                     </div>
 
                     <div>
@@ -107,10 +107,10 @@
                                     <line x1="1" y1="1" x2="23" y2="23"></line>
                                 </svg>
                             </span>
-                                                @error('password')
+                        </div>
+                        @error('password')
                             <p class="cu-form-error text-xs">{{ $message }}</p>
                         @enderror
-                        </div>
                     </div>
 
                     <div>
@@ -129,10 +129,10 @@
                                     <line x1="1" y1="1" x2="23" y2="23"></line>
                                 </svg>
                             </span>
-                                                @error('password_confirmation')
+                        </div>
+                        @error('password_confirmation')
                             <p class="cu-form-error text-xs">{{ $message }}</p>
                         @enderror
-                        </div>
                     </div>
                 </div>
             </div>

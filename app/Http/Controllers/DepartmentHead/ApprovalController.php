@@ -72,13 +72,13 @@ class ApprovalController extends Controller
             $validated['signature']
         );
 
-        $leaveRequest->user->notify(new LeaveRequestStatusUpdatedNotification($leaveRequest, 'pending_hr'));
+        notify_safe($leaveRequest->user, new LeaveRequestStatusUpdatedNotification($leaveRequest, 'pending_hr'));
 
         User::where('role', 'admin')
             ->whereIn('id', AdminAssignment::select('admin_id'))
             ->get()
             ->each(function ($admin) use ($leaveRequest) {
-                $admin->notify(new LeaveRequestSubmittedNotification($leaveRequest, 'admin'));
+                notify_safe($admin, new LeaveRequestSubmittedNotification($leaveRequest, 'admin'));
             });
 
         return redirect()->route('department-head.approvals.pending')
@@ -105,7 +105,7 @@ class ApprovalController extends Controller
             $validated['signature']
         );
 
-        $leaveRequest->user->notify(new LeaveRequestStatusUpdatedNotification($leaveRequest, 'rejected'));
+        notify_safe($leaveRequest->user, new LeaveRequestStatusUpdatedNotification($leaveRequest, 'rejected'));
 
         return redirect()->route('department-head.approvals.pending')
             ->with('success', __('flash.reject_success'));
@@ -127,7 +127,7 @@ class ApprovalController extends Controller
             $validated['reason']
         );
 
-        $leaveRequest->user->notify(new LeaveRequestStatusUpdatedNotification($leaveRequest, 'revoked'));
+        notify_safe($leaveRequest->user, new LeaveRequestStatusUpdatedNotification($leaveRequest, 'revoked'));
 
         return redirect()->route('department-head.approvals.pending')
             ->with('success', __('flash.revoke_success'));

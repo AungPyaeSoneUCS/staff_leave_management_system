@@ -45,4 +45,26 @@ class NotificationController extends Controller
 
         return response()->json(['status' => 'ok']);
     }
+
+    public function destroy($id)
+    {
+        Auth::user()->notifications()->where('id', $id)->delete();
+
+        if (request()->expectsJson()) {
+            return response()->json(['status' => 'ok']);
+        }
+
+        return back()->with('success', __('flash.notification_deleted'));
+    }
+
+    public function clearRead()
+    {
+        $deleted = Auth::user()->readNotifications()->delete();
+
+        if (request()->expectsJson()) {
+            return response()->json(['status' => 'ok', 'deleted' => $deleted]);
+        }
+
+        return back()->with('success', __('flash.notifications_cleared'));
+    }
 }

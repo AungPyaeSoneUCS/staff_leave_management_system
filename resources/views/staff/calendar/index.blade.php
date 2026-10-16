@@ -40,7 +40,8 @@
             </button>
         </div>
 
-        <div class="grid grid-cols-7 gap-px bg-slate-200 rounded-xl overflow-hidden">
+        <div class="overflow-x-auto -mx-2 px-2">
+            <div class="grid grid-cols-7 gap-px bg-slate-200 rounded-xl overflow-hidden min-w-[640px]">
             @foreach(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as $day)
                 <div class="bg-slate-50 p-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     {{ $day }}
@@ -63,11 +64,10 @@
                     $currentDate = \Carbon\Carbon::create($year, $month, $day);
                     $dateKey = $currentDate->format('Y-m-d');
                     $requests = $calendar[$dateKey]['requests'] ?? collect();
-                    $isWeekend = $currentDate->isWeekend();
                     $isToday = $dateKey === $today;
                 @endphp
-                <div class="bg-white p-2 min-h-[100px] {{ $isWeekend ? 'bg-slate-50' : '' }} {{ $isToday ? 'ring-2 ring-primary-500 ring-inset' : '' }} hover:bg-slate-50 transition-colors">
-                    <div class="text-sm font-medium {{ $isToday ? 'text-primary-600' : ($isWeekend ? 'text-slate-500' : 'text-slate-700') }}">
+                <div class="bg-white p-2 min-h-[100px] {{ $isToday ? 'ring-2 ring-primary-500 ring-inset' : '' }} hover:bg-slate-50 transition-colors">
+                    <div class="text-sm font-medium {{ $isToday ? 'text-primary-600' : 'text-slate-700' }}">
                         {{ $day }}
                     </div>
                     @php
@@ -94,6 +94,7 @@
                     @endforeach
                 </div>
             @endfor
+            </div>
         </div>
     </div>
 </div>

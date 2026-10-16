@@ -55,7 +55,7 @@
                 <label class="flex items-center gap-2">
                     <input type="checkbox" name="is_default" value="1"
                            {{ old('is_default', $holiday->is_default) ? 'checked' : '' }}
-                           class="rounded border-slate-300 text-cu-600 focus:ring-cu-500">
+                           class="cu-checkbox">
                     <span class="text-sm text-slate-700">{{ __('admin.default_holiday') }}</span>
                 </label>
                 <p class="text-xs text-slate-500 mt-1">{{ __('admin.default_holiday_hint') }}</p>

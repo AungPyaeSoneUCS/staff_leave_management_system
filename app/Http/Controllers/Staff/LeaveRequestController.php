@@ -180,21 +180,21 @@ class LeaveRequestController extends Controller
             $exchangeUser = $leaveRequest->dutyExchangeUser;
 
             if ($exchangeUser) {
-                $exchangeUser->notify(new DutyExchangeRequestNotification($leaveRequest));
+                notify_safe($exchangeUser, new DutyExchangeRequestNotification($leaveRequest));
             }
         } elseif (auth()->user()->isDepartmentHead() || auth()->user()->isAdmin() || auth()->user()->isSuperAdmin()) {
             User::where('role', 'admin')
                 ->whereIn('id', AdminAssignment::select('admin_id'))
                 ->get()
                 ->each(function ($admin) use ($leaveRequest) {
-                    $admin->notify(new LeaveRequestSubmittedNotification($leaveRequest, 'admin'));
+                    notify_safe($admin, new LeaveRequestSubmittedNotification($leaveRequest, 'admin'));
                 });
         } else {
             $departmentHeadId = $leaveRequest->user->department?->head_id;
             $departmentHead = $departmentHeadId ? User::find($departmentHeadId) : null;
 
             if ($departmentHead && $departmentHead->id !== $leaveRequest->user->id) {
-                $departmentHead->notify(new LeaveRequestSubmittedNotification($leaveRequest, 'department_head'));
+                notify_safe($departmentHead, new LeaveRequestSubmittedNotification($leaveRequest, 'department_head'));
             }
 
             if ($departmentHead && $departmentHead->id === $leaveRequest->user->id) {
@@ -202,12 +202,12 @@ class LeaveRequestController extends Controller
                     ->whereIn('id', AdminAssignment::select('admin_id'))
                     ->get()
                     ->each(function ($admin) use ($leaveRequest) {
-                        $admin->notify(new LeaveRequestSubmittedNotification($leaveRequest, 'admin'));
+                        notify_safe($admin, new LeaveRequestSubmittedNotification($leaveRequest, 'admin'));
                     });
             }
         }
 
-        $leaveRequest->user->notify(new LeaveRequestStatusUpdatedNotification($leaveRequest, 'submitted'));
+        notify_safe($leaveRequest->user, new LeaveRequestStatusUpdatedNotification($leaveRequest, 'submitted'));
 
         return redirect()->route($this->routePrefix().'.index')
             ->with('success', __('flash.submit_success'));
@@ -369,7 +369,7 @@ class LeaveRequestController extends Controller
                 $exchangeUser = $leaveRequest->dutyExchangeUser;
 
                 if ($exchangeUser) {
-                    $exchangeUser->notify(new DutyExchangeRequestNotification($leaveRequest));
+                    notify_safe($exchangeUser, new DutyExchangeRequestNotification($leaveRequest));
                 }
             }
         } elseif (! $hasDutyExchange) {
@@ -380,9 +380,8 @@ class LeaveRequestController extends Controller
             ]);
         }
 
-        $departmentHead = $leaveRequest->user->department?->head;
-        if ($departmentHead && $departmentHead->id !== $leaveRequest->user->id) {
-            $departmentHead->notify(new LeaveRequestStatusUpdatedNotification($leaveRequest, 'updated'));
+        if ($leaveRequest->isPending()) {
+            $this->notifyCurrentApprovers($leaveRequest, 'updated');
         }
 
         return redirect()->route($this->routePrefix().'.show', $leaveRequest)
@@ -406,7 +405,14 @@ class LeaveRequestController extends Controller
             abort(403);
         }
 
+        $wasPending = $leaveRequest->isPending();
+
         $leaveRequest->update(['status' => 'cancelled']);
+
+        if ($wasPending) {
+            $this->notifyCurrentApprovers($leaveRequest, 'cancelled');
+        }
+        $this->notifyDutyExchangeUser($leaveRequest, 'cancelled');
 
         return back()->with('success', __('flash.cancel_success'));
     }
@@ -415,6 +421,11 @@ class LeaveRequestController extends Controller
     {
         if (Gate::denies('delete', $leaveRequest)) {
             abort(403);
+        }
+
+        if ($leaveRequest->isPending()) {
+            $this->notifyCurrentApprovers($leaveRequest, 'cancelled');
+            $this->notifyDutyExchangeUser($leaveRequest, 'cancelled');
         }
 
         if ($leaveRequest->attachment_path) {
@@ -428,5 +439,49 @@ class LeaveRequestController extends Controller
 
         return redirect()->route($this->routePrefix().'.index')
             ->with('success', __('flash.request_deleted'));
+    }
+
+    private function notifyCurrentApprovers(LeaveRequest $leaveRequest, string $status): void
+    {
+        if ($leaveRequest->current_approval_level === 3) {
+            User::where('role', 'super_admin')->get()->each(function ($superAdmin) use ($leaveRequest, $status) {
+                notify_safe($superAdmin, new LeaveRequestStatusUpdatedNotification($leaveRequest, $status));
+            });
+
+            return;
+        }
+
+        if ($leaveRequest->current_approval_level === 2) {
+            $this->notifyAssignedAdmins($leaveRequest, $status);
+
+            return;
+        }
+
+        $departmentHead = $leaveRequest->user->department?->head;
+
+        if ($departmentHead && $departmentHead->id !== $leaveRequest->user->id) {
+            notify_safe($departmentHead, new LeaveRequestStatusUpdatedNotification($leaveRequest, $status));
+        } else {
+            $this->notifyAssignedAdmins($leaveRequest, $status);
+        }
+    }
+
+    private function notifyAssignedAdmins(LeaveRequest $leaveRequest, string $status): void
+    {
+        User::where('role', 'admin')
+            ->whereIn('id', AdminAssignment::select('admin_id'))
+            ->get()
+            ->each(function ($admin) use ($leaveRequest, $status) {
+                notify_safe($admin, new LeaveRequestStatusUpdatedNotification($leaveRequest, $status));
+            });
+    }
+
+    private function notifyDutyExchangeUser(LeaveRequest $leaveRequest, string $status): void
+    {
+        if (! $leaveRequest->duty_exchange_user_id || $leaveRequest->duty_exchange_status !== 'pending') {
+            return;
+        }
+
+        notify_safe($leaveRequest->dutyExchangeUser, new LeaveRequestStatusUpdatedNotification($leaveRequest, $status));
     }
 }

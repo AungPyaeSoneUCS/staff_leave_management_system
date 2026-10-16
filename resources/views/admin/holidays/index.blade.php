@@ -55,7 +55,7 @@
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td class="primary">{{ app()->getLocale() == 'my' ? ($holiday->name_mm ?? $holiday->name) : $holiday->name }}</td>
-                                <td>{{\App\Support\MyanmarDateFormatter::format($holiday->date, 'F d, Y')}}</td>
+                                <td>{{\App\Support\MyanmarDateFormatter::format($holiday->date, 'd/m/Y')}}</td>
                                 <td>{{ $holiday->description ?: '—' }}</td>
                                 <td>
                                     @if($holiday->is_recurring)

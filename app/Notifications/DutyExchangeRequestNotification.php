@@ -37,7 +37,7 @@ class DutyExchangeRequestNotification extends Notification implements ShouldQueu
                 'recipientName' => $recipientName,
                 'staffName' => $staffName,
                 'leaveTypeName' => $leaveTypeName,
-                'url' => route('duty-exchange.show', $this->leaveRequest, false),
+                'url' => mail_route('duty-exchange.show', $this->leaveRequest),
             ]);
     }
 
@@ -52,15 +52,15 @@ class DutyExchangeRequestNotification extends Notification implements ShouldQueu
             'message' => __('notifications.duty_exchange_request_message', [
                 'user' => $staffName,
                 'days' => $this->leaveRequest->total_days,
-                'start_date' => MyanmarDateFormatter::format($this->leaveRequest->start_date, 'F d, Y'),
+                'start_date' => MyanmarDateFormatter::format($this->leaveRequest->start_date, 'd/m/Y'),
             ]),
             'url' => route('duty-exchange.show', $this->leaveRequest, false),
             'leave_request_id' => $this->leaveRequest->id,
             'submitted_by' => $staffName,
             'leave_type' => $leaveTypeName,
             'total_days' => $this->leaveRequest->total_days,
-            'start_date' => MyanmarDateFormatter::format($this->leaveRequest->start_date, 'F d, Y'),
-            'end_date' => MyanmarDateFormatter::format($this->leaveRequest->end_date, 'F d, Y'),
+            'start_date' => MyanmarDateFormatter::format($this->leaveRequest->start_date, 'd/m/Y'),
+            'end_date' => MyanmarDateFormatter::format($this->leaveRequest->end_date, 'd/m/Y'),
             'status' => 'duty_exchange_pending',
         ];
     }

@@ -28,7 +28,7 @@
                     </tr>
                 </thead>
             <tbody>
-                @foreach($leaveTypes as $leaveType)
+                @forelse($leaveTypes as $leaveType)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td class="primary">{{ app()->getLocale() == 'my' ? $leaveType->name_mm ?? $leaveType->name : $leaveType->name }}</td>
@@ -55,7 +55,11 @@
                             </form>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="9" class="text-center py-10 text-slate-500">{{ __('common.no_data') }}</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

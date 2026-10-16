@@ -56,6 +56,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Mail Link Base URL
+    |--------------------------------------------------------------------------
+    |
+    | The absolute base URL used for links inside outgoing emails. Email
+    | clients cannot resolve relative URLs, so every action link points at
+    | this host regardless of the current APP_URL.
+    |
+    */
+
+    'mail_url' => env('MAIL_LINK_URL', 'https://leave.ucsh.edu.mm'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

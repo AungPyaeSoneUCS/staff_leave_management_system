@@ -51,7 +51,7 @@
                         </div>
                         <div class="flex items-center gap-3">
                             <span class="cu-badge-warning">{{ __('common.pending') }}</span>
-                            <a href="{{ route('department-head.approvals.show', $request) }}" class="inline-flex items-center px-5 py-2.5 rounded-full text-sm text-amber-700 bg-amber-50 border border-amber-200 shadow-sm shadow-amber-600/10 transition-all duration-150 hover:bg-amber-100 hover:border-amber-300 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0" title="{{ __('common.view_details') }}">
+                            <a href="{{ route('department-head.approvals.show', $request) }}" class="cu-btn-amber-nude" title="{{ __('common.view_details') }}">
                                 {{ __('common.view_details') }}
                             </a>
                         </div>
@@ -71,7 +71,7 @@
                         <div>
                             <p class="cu-muted">{{ __('common.dates') }}</p>
                             <p class="text-sm font-semibold text-slate-800">
-                                {{\App\Support\MyanmarDateFormatter::format($request->start_date, 'F d, Y')}} – {{ $request->end_date ? \App\Support\MyanmarDateFormatter::format($request->end_date, 'F d, Y') : __('common.unlimited') }}
+                                {{\App\Support\MyanmarDateFormatter::format($request->start_date, 'd/m/Y')}} – {{ $request->end_date ? \App\Support\MyanmarDateFormatter::format($request->end_date, 'd/m/Y') : __('common.unlimited') }}
                             </p>
                         </div>
                         @if($request->duty_exchange_user_id && $request->dutyExchangeUser)

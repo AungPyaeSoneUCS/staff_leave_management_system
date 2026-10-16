@@ -46,7 +46,12 @@ function showConfirmModal(message, confirmText) {
 
         messageEl.textContent = message;
         if (confirmText) {
+            if (!confirmBtn.dataset.defaultText) {
+                confirmBtn.dataset.defaultText = confirmBtn.textContent;
+            }
             confirmBtn.textContent = confirmText;
+        } else if (confirmBtn.dataset.defaultText) {
+            confirmBtn.textContent = confirmBtn.dataset.defaultText;
         }
         modal.classList.remove('hidden');
         confirmBtn.focus();
@@ -180,7 +185,9 @@ function loadNotifications() {
             data.notifications.forEach(function(notification) {
                 const title = notification.data.title || 'Notification';
                 const message = notification.data.message || '';
-                const time = new Date(notification.created_at).toLocaleString();
+                const nd = new Date(notification.created_at);
+                const npad = (n) => String(n).padStart(2, '0');
+                const time = `${npad(nd.getDate())}/${npad(nd.getMonth() + 1)}/${nd.getFullYear()} ${npad(nd.getHours())}:${npad(nd.getMinutes())}`;
                 const unread = notification.read_at === null;
                 let url = notification.data.url || '#';
 
@@ -204,6 +211,11 @@ function loadNotifications() {
                                 <p class="text-xs text-slate-400 mt-1">${time}</p>
                             </div>
                             ${unread ? '<span class="flex-shrink-0 h-2 w-2 rounded-full bg-primary-500 mt-2"></span>' : ''}
+                            <button type="button" onclick="event.stopPropagation(); deleteNotification('${notification.id}')" class="flex-shrink-0 mt-1 text-slate-300 hover:text-rose-500 transition-colors" title="Delete">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
                         </div>
                     </li>
                 `;
@@ -254,10 +266,30 @@ function markAllNotificationsRead() {
     });
 }
 
+function deleteNotification(id) {
+    showConfirmModal('Delete this notification?').then(function(confirmed) {
+        if (!confirmed) {
+            return;
+        }
+
+        fetch('/notifications/' + id, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                'Accept': 'application/json',
+            }
+        }).then(function() {
+            loadNotifications();
+            updateBadgeCount();
+        });
+    });
+}
+
 window.toggleNotificationDropdown = toggleNotificationDropdown;
 window.loadNotifications = loadNotifications;
 window.handleNotificationClick = handleNotificationClick;
 window.markAllNotificationsRead = markAllNotificationsRead;
+window.deleteNotification = deleteNotification;
 window.updateBadgeCount = updateBadgeCount;
 
 function escapeHtml(text) {

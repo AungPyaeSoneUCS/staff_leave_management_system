@@ -48,7 +48,7 @@
 
             <div class="mb-4">
                 <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" name="is_half_day" id="is_half_day" value="1" {{ old('is_half_day') ? 'checked' : '' }} class="rounded border-slate-300 text-cu-600 focus:ring-cu-500">
+                    <input type="checkbox" name="is_half_day" id="is_half_day" value="1" {{ old('is_half_day') ? 'checked' : '' }} class="cu-checkbox">
                     <span class="cu-label mb-0">{{ __('common.half_day') }}</span>
                 </label>
             </div>

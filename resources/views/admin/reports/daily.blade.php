@@ -27,7 +27,7 @@
     </div>
 
     <div id="daily-results" class="cu-card cu-card-body">
-        <h3 class="cu-section-title mb-4">{{ __('admin.daily_report') }} — {{\App\Support\MyanmarDateFormatter::format(now(), 'Y-m-d')}}</h3>
+        <h3 class="cu-section-title mb-4">{{ __('admin.daily_report') }} — {{\App\Support\MyanmarDateFormatter::format(now(), 'd/m/Y')}}</h3>
         <div class="overflow-x-auto">
             <table class="cu-table">
                 <thead>
@@ -74,7 +74,7 @@
         const tableBody = document.getElementById('daily-table-body');
 
         if (!data.table || !data.table.length) {
-            resultsDiv.innerHTML = '<h3 class="cu-section-title mb-4">{{ __('admin.daily_report') }} — {{\App\Support\MyanmarDateFormatter::format(now(), 'Y-m-d')}}</h3><p class="text-slate-500 text-sm">{{ __('common.no_data') }}</p>';
+            resultsDiv.innerHTML = '<h3 class="cu-section-title mb-4">{{ __('admin.daily_report') }} — {{\App\Support\MyanmarDateFormatter::format(now(), 'd/m/Y')}}</h3><p class="text-slate-500 text-sm">{{ __('common.no_data') }}</p>';
             return;
         }
 

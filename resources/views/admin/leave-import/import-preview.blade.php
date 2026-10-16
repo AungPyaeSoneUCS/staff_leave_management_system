@@ -18,8 +18,8 @@
         </div>
 
         @if(!empty($skippedCount))
-            <div class="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                <p class="text-sm text-amber-800">
+            <div class="cu-alert-warning">
+                <p>
                     {{ __('admin.leave_import_skipped_hint', ['skipped' => $skippedCount]) }}
                 </p>
             </div>

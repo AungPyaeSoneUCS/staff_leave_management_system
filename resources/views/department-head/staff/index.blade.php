@@ -135,7 +135,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="text-center text-slate-500 py-8">{{ __('common.no_data') }}</td>
+                            <td colspan="9" class="text-center text-slate-500 py-8">{{ __('common.no_data') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

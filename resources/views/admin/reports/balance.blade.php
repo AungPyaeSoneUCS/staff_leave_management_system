@@ -126,7 +126,7 @@
                     })
                     .catch(err => {
                         console.error(err);
-                        alert('{{ __('flash.error') }}');
+                        showAlertModal('{{ __('flash.error') }}');
                     });
             });
 

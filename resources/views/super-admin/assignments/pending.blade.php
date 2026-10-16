@@ -45,8 +45,8 @@
                             {{ app()->getLocale() == 'my' ? ($leaveRequest->leaveType->name_mm ?? $leaveRequest->leaveType->name) : $leaveRequest->leaveType->name }}
                         </td>
                         <td>{{ $leaveRequest->leaveType->is_not_limited ? '-' : ($leaveRequest->is_half_day ? __('common.half_day') : my_number($leaveRequest->total_days)) }}</td>
-                        <td>{{ \App\Support\MyanmarDateFormatter::format($leaveRequest->start_date, 'F d, Y') }}</td>
-                        <td>{{ $leaveRequest->end_date ? \App\Support\MyanmarDateFormatter::format($leaveRequest->end_date, 'F d, Y') : __('common.unlimited') }}</td>
+                        <td>{{ \App\Support\MyanmarDateFormatter::format($leaveRequest->start_date, 'd/m/Y') }}</td>
+                        <td>{{ $leaveRequest->end_date ? \App\Support\MyanmarDateFormatter::format($leaveRequest->end_date, 'd/m/Y') : __('common.unlimited') }}</td>
                     </tr>
                 @empty
                     <tr>

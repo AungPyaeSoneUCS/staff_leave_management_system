@@ -29,7 +29,7 @@
                     </tr>
                 </thead>
             <tbody>
-                @foreach($departments as $department)
+                @forelse($departments as $department)
                     <tr>
                         <td>{{ config('app.locale') == 'my' ? my_number($departments->firstItem() + $loop->index) : $departments->firstItem() + $loop->index }}</td>
                         <td class="primary">{{ app()->getLocale() == 'my' ? $department->name_mm ?? $department->name : $department->name }}</td>
@@ -47,7 +47,11 @@
                             </form>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="7" class="text-center py-10 text-slate-500">{{ __('common.no_data') }}</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

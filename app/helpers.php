@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 if (! function_exists('my_number')) {
     function my_number(int|float|string $value): string
@@ -105,5 +106,44 @@ if (! function_exists('get_duty_exchange_candidates')) {
         }
 
         return [];
+    }
+}
+
+if (! function_exists('notify_safe')) {
+    function notify_safe(?object $notifiable, object $notification): void
+    {
+        if ($notifiable === null) {
+            return;
+        }
+
+        try {
+            $notifiable->notify($notification);
+        } catch (Throwable $e) {
+            Log::warning('Notification could not be sent.', [
+                'notifiable' => $notifiable::class,
+                'notifiable_id' => $notifiable->id ?? null,
+                'notification' => $notification::class,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+}
+
+if (! function_exists('mail_route')) {
+    function mail_route(string $name, mixed $parameters = [], bool $absolute = true): string
+    {
+        $path = route($name, $parameters, false);
+
+        if (! $absolute) {
+            return $path;
+        }
+
+        $base = rtrim((string) config('app.mail_url'), '/');
+
+        if ($base === '') {
+            return route($name, $parameters);
+        }
+
+        return $base.'/'.ltrim($path, '/');
     }
 }

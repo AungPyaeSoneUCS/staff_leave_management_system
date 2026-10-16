@@ -35,6 +35,7 @@ class LeaveRequest extends Model
         'duty_exchange_status',
         'duty_exchange_confirmed_at',
         'duty_exchange_remarks',
+        'duty_exchange_signature',
     ];
 
     protected function casts(): array

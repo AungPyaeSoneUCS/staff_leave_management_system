@@ -33,11 +33,11 @@ class LeaveRequestSubmittedNotification extends Notification implements ShouldQu
         $texts = config("mail_texts.{$configKey}", config('mail_texts.leave_request_submitted'));
 
         $url = match ($this->recipientType) {
-            'staff' => route('staff.leave-requests.show', $this->leaveRequest, false),
-            'department_head' => route('department-head.approvals.show', $this->leaveRequest, false),
-            'admin' => route('central-admin.approvals.show', $this->leaveRequest, false),
-            'super_admin' => route('central-admin.approvals.show', $this->leaveRequest, false),
-            default => route('staff.leave-requests.show', $this->leaveRequest, false),
+            'staff' => mail_route('staff.leave-requests.show', $this->leaveRequest),
+            'department_head' => mail_route('department-head.approvals.show', $this->leaveRequest),
+            'admin' => mail_route('central-admin.approvals.show', $this->leaveRequest),
+            'super_admin' => mail_route('central-admin.approvals.show', $this->leaveRequest),
+            default => mail_route('staff.leave-requests.show', $this->leaveRequest),
         };
 
         $locale = app()->getLocale();
@@ -77,15 +77,15 @@ class LeaveRequestSubmittedNotification extends Notification implements ShouldQu
             'message' => __('notifications.new_request_message', [
                 'user' => $staffName,
                 'days' => $this->leaveRequest->total_days,
-                'start_date' => MyanmarDateFormatter::format($this->leaveRequest->start_date, 'F d, Y'),
+                'start_date' => MyanmarDateFormatter::format($this->leaveRequest->start_date, 'd/m/Y'),
             ]),
             'url' => $url,
             'leave_request_id' => $this->leaveRequest->id,
             'submitted_by' => $staffName,
             'leave_type' => $leaveTypeName,
             'total_days' => $this->leaveRequest->total_days,
-            'start_date' => MyanmarDateFormatter::format($this->leaveRequest->start_date, 'F d, Y'),
-            'end_date' => MyanmarDateFormatter::format($this->leaveRequest->end_date, 'F d, Y'),
+            'start_date' => MyanmarDateFormatter::format($this->leaveRequest->start_date, 'd/m/Y'),
+            'end_date' => MyanmarDateFormatter::format($this->leaveRequest->end_date, 'd/m/Y'),
         ];
     }
 }

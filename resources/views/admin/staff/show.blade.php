@@ -107,10 +107,10 @@
                                     {{ app()->getLocale() == 'my' ? ($request->leaveType->name_mm ?? $request->leaveType->name) : $request->leaveType->name }}
                                 </td>
                                 <td>
-                                    {{ $request->start_date ? \App\Support\MyanmarDateFormatter::format($request->start_date, 'F d, Y') : __('common.n_a') }}
+                                    {{ $request->start_date ? \App\Support\MyanmarDateFormatter::format($request->start_date, 'd/m/Y') : __('common.n_a') }}
                                 </td>
                                 <td>
-                                    {{ $request->end_date ? \App\Support\MyanmarDateFormatter::format($request->end_date, 'F d, Y') : __('common.unlimited') }}
+                                    {{ $request->end_date ? \App\Support\MyanmarDateFormatter::format($request->end_date, 'd/m/Y') : __('common.unlimited') }}
                                 </td>
                                 <td>{{ $request->leaveType->is_not_limited ? '-' : ($request->is_half_day ? __('common.half_day') : my_number($request->total_days)) }}</td>
                                 <td>

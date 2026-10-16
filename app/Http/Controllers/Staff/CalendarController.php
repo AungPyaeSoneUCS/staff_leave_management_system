@@ -43,7 +43,6 @@ class CalendarController extends Controller
                 'date' => $date->copy(),
                 'requests' => $leaveRequests->get($dateKey, collect()),
                 'holiday' => $holidays->get($dateKey),
-                'is_weekend' => $date->isWeekend(),
             ];
         }
 

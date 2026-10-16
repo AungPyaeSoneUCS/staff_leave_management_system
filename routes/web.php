@@ -133,6 +133,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/notifications/all', [NotificationController::class, 'all'])->name('notifications.all');
     Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::put('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::delete('/notifications/clear-read', [NotificationController::class, 'clearRead'])->name('notifications.clear-read');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 
     Route::post('/logout', function (Request $request) {
         Auth::logout();
@@ -215,7 +217,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/leave-import/calculate-total-days', [LeaveImportController::class, 'calculateTotalDaysApi'])->name('leave-import.calculate-total-days');
         Route::get('/leave-records', [AdminDashboardController::class, 'leaveRecords'])->name('leave-records');
         Route::get('/leave-records/export', [AdminDashboardController::class, 'exportLeaveRecords'])->name('leave-records.export');
-Route::get('/leave-records/order', [AdminDashboardController::class, 'leaveRecordOrder'])->name('leave-records.order');
+        Route::get('/leave-records/order', [AdminDashboardController::class, 'leaveRecordOrder'])->name('leave-records.order');
 
         Route::post('/leave-records/order', [AdminDashboardController::class, 'saveLeaveRecordOrder'])->name('leave-records.order.save');
 

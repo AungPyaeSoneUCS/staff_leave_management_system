@@ -44,12 +44,12 @@
             </div>
             <div>
                 <p class="cu-muted">{{ __('common.start_date') }}</p>
-                <p class="text-base font-semibold text-slate-900">{{\App\Support\MyanmarDateFormatter::format($leaveRequest->start_date, 'l, F d, Y')}}</p>
+                <p class="text-base font-semibold text-slate-900">{{\App\Support\MyanmarDateFormatter::format($leaveRequest->start_date, 'd/m/Y')}}</p>
             </div>
             <div>
                 <p class="cu-muted">{{ __('common.end_date') }}</p>
                 <p class="text-base font-semibold text-slate-900">
-                    {{ $leaveRequest->end_date ? \App\Support\MyanmarDateFormatter::format($leaveRequest->end_date, 'l, F d, Y') : __('common.unlimited') }}
+                    {{ $leaveRequest->end_date ? \App\Support\MyanmarDateFormatter::format($leaveRequest->end_date, 'd/m/Y') : __('common.unlimited') }}
                 </p>
             </div>
             <div>
@@ -105,14 +105,27 @@
                         <p class="text-base font-semibold text-slate-900">{{ $leaveRequest->dutyExchangeUser->position ?? '-' }}</p>
                     </div>
                 </div>
+                @if($leaveRequest->duty_exchange_signature)
+                    <div class="rounded-xl bg-slate-50 border border-slate-100 p-4 mt-4">
+                        <p class="cu-muted">{{ __('common.duty_exchange_staff') }} — {{ __('common.signature') }}</p>
+                        <img src="{{ $leaveRequest->duty_exchange_signature }}" alt="{{ __('common.signature') }}"
+                             class="mt-1 w-36 h-20 object-contain border border-slate-200 rounded-lg bg-white p-1">
+                    </div>
+                @endif
             </div>
         @endif
 
         @if($leaveRequest->isAwaitingDutyExchange())
             <div class="border-t border-slate-100 pt-6">
                 <h3 class="cu-section-title mb-4">{{ __('duty_exchange.decision_panel') }}</h3>
+
+                <x-signature-pad
+                    targets="duty-exchange-accept-form,duty-exchange-reject-form"
+                    :required="true"
+                    :label="__('common.duty_exchange_staff') . ' — ' . __('common.signature')" />
+
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <form action="{{ route('duty-exchange.accept', $leaveRequest) }}" method="POST" class="flex-1">
+                    <form id="duty-exchange-accept-form" action="{{ route('duty-exchange.accept', $leaveRequest) }}" method="POST" class="flex-1">
                         @csrf
                         <div class="mb-2">
                             <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('duty_exchange.accept') }}</label>
@@ -126,7 +139,7 @@
                         <button type="submit" class="cu-btn-success w-full">{{ __('duty_exchange.accept_and_forward') }}</button>
                     </form>
 
-                    <form action="{{ route('duty-exchange.reject', $leaveRequest) }}" method="POST" class="flex-1">
+                    <form id="duty-exchange-reject-form" action="{{ route('duty-exchange.reject', $leaveRequest) }}" method="POST" class="flex-1">
                         @csrf
                         <div class="mb-2">
                             <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('duty_exchange.reject') }}</label>
