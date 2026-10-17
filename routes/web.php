@@ -25,6 +25,7 @@ use App\Http\Controllers\Staff\ProfileController;
 use App\Http\Controllers\SuperAdmin\AdminAssignmentController;
 use App\Http\Controllers\SuperAdmin\AdminManagementController;
 use App\Http\Controllers\SuperAdmin\RegisterController as SuperAdminRegisterController;
+use App\Mail\AccountActivityMail;
 use App\Models\LeaveType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -92,6 +93,14 @@ Route::middleware('guest')->group(function () {
         }
 
         $user = Auth::user();
+
+        send_mail_safe($user->email, new AccountActivityMail(
+            name: $user->name,
+            action: 'login',
+            ip: (string) $request->ip(),
+            time: now()->format('d/m/Y H:i'),
+        ));
+
         if ($user->role === 'super_admin' || $user->role === 'admin') {
             return redirect()->route('admin.dashboard');
         } elseif ($user->role === 'department_head') {
@@ -137,6 +146,17 @@ Route::middleware('auth')->group(function () {
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 
     Route::post('/logout', function (Request $request) {
+        $user = $request->user();
+
+        if ($user) {
+            send_mail_safe($user->email, new AccountActivityMail(
+                name: $user->name,
+                action: 'logout',
+                ip: (string) $request->ip(),
+                time: now()->format('d/m/Y H:i'),
+            ));
+        }
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

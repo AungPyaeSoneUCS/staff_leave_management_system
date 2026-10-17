@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 if (! function_exists('my_number')) {
     function my_number(int|float|string $value): string
@@ -145,5 +146,24 @@ if (! function_exists('mail_route')) {
         }
 
         return $base.'/'.ltrim($path, '/');
+    }
+}
+
+if (! function_exists('send_mail_safe')) {
+    function send_mail_safe(?string $to, object $mailable): void
+    {
+        if (empty($to)) {
+            return;
+        }
+
+        try {
+            Mail::to($to)->send($mailable);
+        } catch (Throwable $e) {
+            Log::warning('Mail could not be sent.', [
+                'to' => $to,
+                'mailable' => $mailable::class,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

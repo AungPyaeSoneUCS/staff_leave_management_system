@@ -2,7 +2,9 @@
 {{-- Header --}}
 <x-slot:header>
 <x-mail::header :url="config('app.mail_url')">
-{{ config('app.name') }}
+<img src="{{ rtrim(config('app.mail_url'), '/') }}/images/ucsh_logo.jpg" class="logo" alt="{{ config('app.name') }}">
+<span class="brand-name">{{ config('app.name') }}</span>
+<span class="brand-sub">{{ __('Staff Leave Management System') }}</span>
 </x-mail::header>
 </x-slot:header>
 

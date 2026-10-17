@@ -148,7 +148,13 @@ class ApprovalController extends Controller
     {
         $departmentId = auth()->user()->department_id;
 
-        $query = LeaveRequest::where('reviewer_id', auth()->id())
+        $query = LeaveRequest::where(function ($query) {
+            $query->where('reviewer_id', auth()->id())
+                ->orWhere(function ($q) {
+                    $q->where('status', 'cancelled')
+                        ->where('current_approval_level', 1);
+                });
+        })
             ->whereHas('user', function ($query) use ($departmentId) {
                 $query->where('department_id', $departmentId);
             })

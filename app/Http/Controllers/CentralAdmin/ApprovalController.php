@@ -129,10 +129,18 @@ class ApprovalController extends Controller
         $processedRequests = LeaveRequest::where(function ($query) {
             if (auth()->user()->isSuperAdmin()) {
                 $query->where('super_admin_id', auth()->id())
-                    ->orWhere('cancelled_by_id', auth()->id());
+                    ->orWhere('cancelled_by_id', auth()->id())
+                    ->orWhere(function ($q) {
+                        $q->where('status', 'cancelled')
+                            ->where('current_approval_level', 3);
+                    });
             } else {
                 $query->where('hr_id', auth()->id())
-                    ->orWhere('cancelled_by_id', auth()->id());
+                    ->orWhere('cancelled_by_id', auth()->id())
+                    ->orWhere(function ($q) {
+                        $q->where('status', 'cancelled')
+                            ->where('current_approval_level', 2);
+                    });
             }
         })
             ->when($search = $request->query('search'), function ($query) use ($search) {

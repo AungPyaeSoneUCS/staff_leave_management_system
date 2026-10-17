@@ -407,7 +407,11 @@ class LeaveRequestController extends Controller
 
         $wasPending = $leaveRequest->isPending();
 
-        $leaveRequest->update(['status' => 'cancelled']);
+        $leaveRequest->update([
+            'status' => 'cancelled',
+            'cancelled_by_id' => auth()->id(),
+            'cancelled_at' => now(),
+        ]);
 
         if ($wasPending) {
             $this->notifyCurrentApprovers($leaveRequest, 'cancelled');

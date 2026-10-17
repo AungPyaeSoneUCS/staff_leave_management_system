@@ -36,6 +36,9 @@ class LeaveRequest extends Model
         'duty_exchange_confirmed_at',
         'duty_exchange_remarks',
         'duty_exchange_signature',
+        'cancelled_by_id',
+        'cancelled_at',
+        'cancellation_reason',
     ];
 
     protected function casts(): array
@@ -48,6 +51,7 @@ class LeaveRequest extends Model
             'current_approval_level' => 'integer',
             'reviewed_at' => 'datetime',
             'duty_exchange_confirmed_at' => 'datetime',
+            'cancelled_at' => 'datetime',
             'is_half_day' => 'boolean',
         ];
     }

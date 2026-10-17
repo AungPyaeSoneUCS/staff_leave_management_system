@@ -102,7 +102,10 @@
                             </span>
                         </td>
                         <td>{{ $request->reviewed_at ? \App\Support\MyanmarDateFormatter::format($request->reviewed_at, 'd/m/Y') : __('common.n_a') }}</td>
-                        <td>{{ app()->getLocale() == 'my' ? $request->reviewer->name_mm ?? $request->reviewer->name : $request->reviewer->name ?? ($request->hr->name ?? __('common.n_a')) }}</td>
+                        <td>
+                            @php $reviewedBy = $request->reviewer ?? $request->hr; @endphp
+                            {{ $reviewedBy ? (app()->getLocale() == 'my' ? ($reviewedBy->name_mm ?? $reviewedBy->name) : $reviewedBy->name) : __('common.n_a') }}
+                        </td>
                         <td>
                             <a href="{{ route('department-head.approvals.show', $request) }}" class="cu-btn-amber-nude !px-3 !py-1.5 text-xs" title="{{ __('common.view') }}">
                                 {{ __('common.view') }}
